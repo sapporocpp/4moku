@@ -89,7 +89,7 @@ int finished(const Board& board) {
 		if(piece==0)
 			return 0;
 		for(int i=1;i<4;++i) {
-			if(x+dx*i>=nx || y+dy*i>=ny)
+			if(x+dx*i>=nx || x+dx*i<0 || y+dy*i>=ny || y+dy*i<0)
 				return 0;
 			if(piece!=board(x+dx*i,y+dy*i))
 				return 0;

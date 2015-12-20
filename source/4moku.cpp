@@ -5,7 +5,8 @@
 #include<memory>
 #include<vector>
 #include<locale>
-#include<codecvt>
+
+struct Board;
 
 const int WIN=1;
 const int FAILED=2;
@@ -34,17 +35,22 @@ struct Board {
 };
 
 void disp(const Board& board) {
-	std::wstring_convert<std::codecvt_utf8<char32_t>,char32_t> converter;
+	const std::vector<std::string> marker{" ","◯","□","△","●","■","▲","◇","◆"};
 	int nx,ny;
 	std::tie(nx,ny) = board.size();
 	for(int j=ny-1;j>=0;--j) {
-		std::u32string line;
+		// 何も置かれてない行は表示させない
+		bool empty_line = true;
+		for(int i=0;i<nx;++i)
+			empty_line &= board(i,j)==0;
+		if(empty_line)
+			continue;
+
+		std::string line;
 		for(int i=0;i<nx;++i) {
-			const auto marker = U"　◯□△●■▲◇◆";
 			line += marker[board(i,j)];
 		}
-		if(!std::all_of(line.begin(),line.end(),[](auto x){return x==U'　';}))
-			std::cout << converter.to_bytes(line) << std::endl;
+		std::cout << line << std::endl;
 	}
 	std::cout << std::endl;
 }

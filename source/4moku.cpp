@@ -35,11 +35,11 @@ struct Board {
 };
 
 void disp(const Board& board) {
-	const std::vector<std::string> marker{" ","â—¯","â–¡","â–³","â—","â– ","â–²","â—‡","â—†"};
+	const std::vector<std::string> marker{" ","ü"," ","¢","œ","¡","£","","Ÿ"};
 	int nx,ny;
 	std::tie(nx,ny) = board.size();
 	for(int j=ny-1;j>=0;--j) {
-		// ä½•ã‚‚ç½®ã‹ã‚Œã¦ãªã„è¡Œã¯è¡¨ç¤ºã•ã›ãªã„
+		// ‰½‚à’u‚©‚ê‚Ä‚È‚¢s‚Í•\¦‚³‚¹‚È‚¢
 		bool empty_line = true;
 		for(int i=0;i<nx;++i)
 			empty_line &= board(i,j)==0;
@@ -63,16 +63,16 @@ bool placeable(const Board& board, int x, int y) {
 	int nx,ny;
 	std::tie(nx,ny) = board.size();
 
-	// boardç¯„å›²å¤–ã¯ãŠã‘ãªã„
+	// board”ÍˆÍŠO‚Í‚¨‚¯‚È‚¢
 	if(x<0 || y<0 || nx<=x || ny<=y)
 		return false;
 
-	// ã™ã§ã«ç½®ã‹ã‚Œã¦ã„ã‚‹ã¨ã“ã‚ã«ã¯ç½®ã‘ãªã„
+	// ‚·‚Å‚É’u‚©‚ê‚Ä‚¢‚é‚Æ‚±‚ë‚É‚Í’u‚¯‚È‚¢
 	if(board(x,y)!=0)
 		return false;
 
-	// ä¸‹ã¯pieceã¾ãŸã¯å£ã§ãªã‘ã‚Œã°ãªã‚‰ãªã„
-	// (2æ®µç›®ä»¥ä¸Šãªã‚‰ä¸‹ã«pieceãŒãªã‘ã‚Œã°ãªã‚‰ãªã„)
+	// ‰º‚Ípiece‚Ü‚½‚Í•Ç‚Å‚È‚¯‚ê‚Î‚È‚ç‚È‚¢
+	// (2’i–ÚˆÈã‚È‚ç‰º‚Épiece‚ª‚È‚¯‚ê‚Î‚È‚ç‚È‚¢)
 	if(y>0 && board(x,y-1)==0)
 		return false;
 	
@@ -98,19 +98,19 @@ int finished(const Board& board) {
 
 	for(int i=0;i<nx;++i) {
 		for(int j=0;j<ny;++j) {
-			// å³æ–¹å‘
+			// ‰E•ûŒü
 			const auto right = f(i,j,1,0);
 			if(right>0) return right;
 
-			// ä¸‹æ–¹å‘
+			// ‰º•ûŒü
 			const auto down = f(i,j,0,-1);
 			if(down>0) return down;
 
-			// å³ä¸‹æ–¹å‘
+			// ‰E‰º•ûŒü
 			const auto rightdown = f(i,j,1,-1);
 			if(rightdown>0) return rightdown;
 
-			// å³ä¸Šæ–¹å‘
+			// ‰Eã•ûŒü
 			const auto rightup= f(i,j,1,1);
 			if(rightup>0) return rightup;
 		}

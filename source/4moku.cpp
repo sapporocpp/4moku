@@ -5,6 +5,7 @@
 #include<memory>
 #include<vector>
 #include<locale>
+#include<functional>
 
 struct Board;
 

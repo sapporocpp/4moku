@@ -36,7 +36,7 @@ struct Board {
 };
 
 void disp(const Board& board) {
-	const std::vector<std::string> marker{" ","ü"," ","¢","œ","¡","£","","Ÿ"};
+	const std::vector<std::string> marker{"@","ü"," ","¢","œ","¡","£","","Ÿ"};
 	int nx,ny;
 	std::tie(nx,ny) = board.size();
 	for(int j=ny-1;j>=0;--j) {

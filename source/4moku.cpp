@@ -1,4 +1,4 @@
-#include<iostream>
+ï»¿#include<iostream>
 #include<algorithm>
 #include<random>
 #include<string>
@@ -36,11 +36,13 @@ struct Board {
 };
 
 void disp(const Board& board) {
-	const std::vector<std::string> marker{"@","ü"," ","¢","œ","¡","£","","Ÿ"};
+	const std::vector<std::string> marker{"ã€€","â—¯","â–¡","â–³","â—","â– ","â–²","â—‡","â—†"};
+
 	int nx,ny;
+
 	std::tie(nx,ny) = board.size();
 	for(int j=ny-1;j>=0;--j) {
-		// ‰½‚à’u‚©‚ê‚Ä‚È‚¢s‚Í•\¦‚³‚¹‚È‚¢
+		// ä½•ã‚‚ç½®ã‹ã‚Œã¦ãªã„è¡Œã¯è¡¨ç¤ºã•ã›ãªã„
 		bool empty_line = true;
 		for(int i=0;i<nx;++i)
 			empty_line &= board(i,j)==0;
@@ -64,16 +66,16 @@ bool placeable(const Board& board, int x, int y) {
 	int nx,ny;
 	std::tie(nx,ny) = board.size();
 
-	// board”ÍˆÍŠO‚Í‚¨‚¯‚È‚¢
+	// boardç¯„å›²å¤–ã¯ãŠã‘ãªã„
 	if(x<0 || y<0 || nx<=x || ny<=y)
 		return false;
 
-	// ‚·‚Å‚É’u‚©‚ê‚Ä‚¢‚é‚Æ‚±‚ë‚É‚Í’u‚¯‚È‚¢
+	// ã™ã§ã«ç½®ã‹ã‚Œã¦ã„ã‚‹ã¨ã“ã‚ã«ã¯ç½®ã‘ãªã„
 	if(board(x,y)!=0)
 		return false;
 
-	// ‰º‚Ípiece‚Ü‚½‚Í•Ç‚Å‚È‚¯‚ê‚Î‚È‚ç‚È‚¢
-	// (2’i–ÚˆÈã‚È‚ç‰º‚Épiece‚ª‚È‚¯‚ê‚Î‚È‚ç‚È‚¢)
+	// ä¸‹ã¯pieceã¾ãŸã¯å£ã§ãªã‘ã‚Œã°ãªã‚‰ãªã„
+	// (2æ®µç›®ä»¥ä¸Šãªã‚‰ä¸‹ã«pieceãŒãªã‘ã‚Œã°ãªã‚‰ãªã„)
 	if(y>0 && board(x,y-1)==0)
 		return false;
 	
@@ -99,19 +101,19 @@ int finished(const Board& board) {
 
 	for(int i=0;i<nx;++i) {
 		for(int j=0;j<ny;++j) {
-			// ‰E•ûŒü
+			// å³æ–¹å‘
 			const auto right = f(i,j,1,0);
 			if(right>0) return right;
 
-			// ‰º•ûŒü
+			// ä¸‹æ–¹å‘
 			const auto down = f(i,j,0,-1);
 			if(down>0) return down;
 
-			// ‰E‰º•ûŒü
+			// å³ä¸‹æ–¹å‘
 			const auto rightdown = f(i,j,1,-1);
 			if(rightdown>0) return rightdown;
 
-			// ‰Eã•ûŒü
+			// å³ä¸Šæ–¹å‘
 			const auto rightup= f(i,j,1,1);
 			if(rightup>0) return rightup;
 		}

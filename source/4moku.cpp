@@ -1,43 +1,42 @@
-﻿#include<iostream>
-#include<algorithm>
-#include<random>
-#include<string>
-#include<memory>
-#include<vector>
-#include<locale>
-#include<functional>
+﻿#include "4moku.hpp"
 
-struct Board;
+// ここに使うAIを定義する
+#define AI_FUNCTION AIFunction1
+#include "test_ai.hpp"
+#undef AI_FUNCTION
+#define AI_FUNCTION AIFunction2
+#include "ai_winning.hpp"
+#undef AI_FUNCTION
+#define AI_FUNCTION AIFunction3
+#include "test_ai.hpp"
+#undef AI_FUNCTION
+#define AI_FUNCTION AIFunction4
+#include "test_ai.hpp"
+#undef AI_FUNCTION
+#define AI_FUNCTION AIFunction5
+#include "test_ai.hpp"
+#undef AI_FUNCTION
+#define AI_FUNCTION AIFunction6
+#include "test_ai.hpp"
+#undef AI_FUNCTION
+#define AI_FUNCTION AIFunction7
+#include "test_ai.hpp"
+#undef AI_FUNCTION
+#define AI_FUNCTION AIFunction8
+#include "test_ai.hpp"
+#undef AI_FUNCTION
 
-const int WIN=1;
-const int FAILED=2;
-std::function<std::tuple<int,int>(const Board&,int)> ai[8];
+int Board::operator()(int x, int y) const {
+	return data[x + y*xnum];
+}
 
-struct Board {
-	Board(const int xnum, const int ynum) : 
-		xnum(xnum),ynum(ynum),data(xnum*ynum) 
-	{ }
+int& Board::operator()(int x, int y) {
+	return data[x + y*xnum];
+}
 
-	Board(const Board& other) : 
-		xnum(other.xnum),ynum(other.ynum),data(other.data) 
-	{ }
-
-	int operator()(int x, int y) const {
-		return data[x + y*xnum];
-	}
-
-	int& operator()(int x, int y) {
-		return data[x + y*xnum];
-	}
-
-	const std::tuple<int,int> size() const {
-		return std::make_tuple(xnum,ynum);
-	}
-
-	private:
-	std::size_t xnum, ynum;
-	std::vector<int> data;
-};
+const std::tuple<int,int> Board::size() const {
+	return std::make_tuple(xnum,ynum);
+}
 
 void disp(const Board& board) {
 	const std::vector<std::string> marker{"　","◯","□","△","●","■","▲","◇","◆"};
@@ -62,7 +61,7 @@ void disp(const Board& board) {
 	std::cout << std::endl;
 }
 
-int player_id(int player) {
+int player_id(int player){
 	return player+1;
 }
 
@@ -146,65 +145,21 @@ int update(Board& board,const int player,
 	return 0;
 }
 
-std::tuple<int,int> test_ai(const Board& board,int /*player*/) {
-	int nx,ny;
-	std::tie(nx,ny) = board.size();
-
-	std::random_device rd;
-	std::mt19937 mt(rd());
-	std::uniform_int_distribution<> rndx(0,nx);
-	std::uniform_int_distribution<> rndy(0,ny);
-
-	for(int i=0;i<300;++i) {
-		int x=rndx(mt), y=rndy(mt);
-		if(placeable(board, x, y)) 
-			return std::make_tuple(x,y);
-	}
-
-	return std::make_tuple(rndx(mt),rndy(mt));
-}
-
-std::tuple<int,int> ai_winning(const Board& board,int player) {
-    // 自分が勝つことが確定するような置き場所があるならそこに置く。
-    // そうでなければランダムに置く。
-    
-	int nx,ny;
-	std::tie(nx,ny) = board.size();
-
-	std::random_device rd;
-	std::mt19937 mt(rd());
-	std::uniform_int_distribution<> rndx(0,nx);
-	std::uniform_int_distribution<> rndy(0,ny);
-	
-	std::tuple<int,int> random_choice = std::make_tuple(-1,-1);
-	
-	for(int i=0;i<300;++i) {
-		int x=rndx(mt), y=rndy(mt);
-		if(placeable(board, x, y)){
-			// 置けるなら
-			Board board_tmp(board);
-			board_tmp(x,y) = player;
-			
-			if(finished(board_tmp)){
-				// そこに置いて勝つなら
-				return std::make_tuple(x,y);
-			}else{
-				// そうでないなら
-				if(std::get<0>(random_choice) == -1){
-					random_choice = std::make_tuple(x,y);
-				}
-			}
-		}
-	}
-	
-	return random_choice;
-}
-
+// メイン
 int main() {
+	std::function<std::tuple<int,int>(const Board&,int)> ai[8];
+	ai[0] = AIFunction1;
+	ai[1] = AIFunction2;
+	ai[2] = AIFunction3;
+	ai[3] = AIFunction4;
+	ai[4] = AIFunction5;
+	ai[5] = AIFunction6;
+	ai[6] = AIFunction7;
+	ai[7] = AIFunction8;
+	
 	const auto xnum = 10, ynum=5;
 	Board board = {xnum, ynum};
-	for(int i=0;i<8;++i) ai[i]=ai_winning;
-
+	
 	const int num_players = 4;
 	while(true){
 		int player,state;
@@ -227,5 +182,4 @@ int main() {
 
 	return 0;
 }
-
 

@@ -18,6 +18,10 @@ struct Board {
 		xnum(xnum),ynum(ynum),data(xnum*ynum) 
 	{ }
 
+	Board(const Board& other) : 
+		xnum(other.xnum),ynum(other.ynum),data(other.data) 
+	{ }
+
 	int operator()(int x, int y) const {
 		return data[x + y*xnum];
 	}
@@ -160,10 +164,46 @@ std::tuple<int,int> test_ai(const Board& board,int /*player*/) {
 	return std::make_tuple(rndx(mt),rndy(mt));
 }
 
+std::tuple<int,int> ai_winning(const Board& board,int player) {
+    // 自分が勝つことが確定するような置き場所があるならそこに置く。
+    // そうでなければランダムに置く。
+    
+	int nx,ny;
+	std::tie(nx,ny) = board.size();
+
+	std::random_device rd;
+	std::mt19937 mt(rd());
+	std::uniform_int_distribution<> rndx(0,nx);
+	std::uniform_int_distribution<> rndy(0,ny);
+	
+	std::tuple<int,int> random_choice = std::make_tuple(-1,-1);
+	
+	for(int i=0;i<300;++i) {
+		int x=rndx(mt), y=rndy(mt);
+		if(placeable(board, x, y)){
+			// 置けるなら
+			Board board_tmp(board);
+			board_tmp(x,y) = player;
+			
+			if(finished(board_tmp)){
+				// そこに置いて勝つなら
+				return std::make_tuple(x,y);
+			}else{
+				// そうでないなら
+				if(std::get<0>(random_choice) == -1){
+					random_choice = std::make_tuple(x,y);
+				}
+			}
+		}
+	}
+	
+	return random_choice;
+}
+
 int main() {
 	const auto xnum = 10, ynum=5;
 	Board board = {xnum, ynum};
-	for(int i=0;i<8;++i) ai[i]=test_ai;
+	for(int i=0;i<8;++i) ai[i]=ai_winning;
 
 	const int num_players = 4;
 	while(true){

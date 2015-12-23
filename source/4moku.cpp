@@ -1,4 +1,11 @@
 ﻿#include "4moku.hpp"
+#include<cstdlib>
+
+// 定義されているAIの数
+constexpr std::size_t NUM_AI = 10;
+
+// 一度に対戦させられる数
+constexpr std::size_t NUM_PLAY = 8;
 
 // ここに使うAIを定義する
 #define AI_FUNCTION AIFunction1
@@ -23,6 +30,12 @@
 #include "test_ai.hpp"
 #undef AI_FUNCTION
 #define AI_FUNCTION AIFunction8
+#include "test_ai.hpp"
+#undef AI_FUNCTION
+#define AI_FUNCTION AIFunction9
+#include "test_ai.hpp"
+#undef AI_FUNCTION
+#define AI_FUNCTION AIFunction10
 #include "test_ai.hpp"
 #undef AI_FUNCTION
 
@@ -145,22 +158,51 @@ int update(Board& board,const int player,
 	return 0;
 }
 
+// コマンドライン引数の説明を表示して終了
+void usage_and_exit(){
+	std::cerr << "Usage: 4moku [SIZE_X] [SIZE_Y] [AI_ID1] [AI_ID2] ..." << std::endl;
+	std::cerr << "    Specify [SIZE_X] and [SIZE_Y] with integers 2 or larger." << std::endl;
+	std::cerr << "    Specify every [AI_ID#] with an integer between 1 to " << NUM_AI << "." << std::endl;
+	std::cerr << "    Example: 4moku 5 2 1 3 1 2" << std::endl;
+	std::exit(-1);
+}
+
 // メイン
-int main() {
-	std::function<std::tuple<int,int>(const Board&,int)> ai[8];
-	ai[0] = AIFunction1;
-	ai[1] = AIFunction2;
-	ai[2] = AIFunction3;
-	ai[3] = AIFunction4;
-	ai[4] = AIFunction5;
-	ai[5] = AIFunction6;
-	ai[6] = AIFunction7;
-	ai[7] = AIFunction8;
+int main(int argc, char ** argv) {
+	std::function<std::tuple<int,int>(const Board&,int)> ai_list[NUM_AI] = {
+		AIFunction1,
+		AIFunction2,
+		AIFunction3,
+		AIFunction4,
+		AIFunction5,
+		AIFunction6,
+		AIFunction7,
+		AIFunction8,
+		AIFunction9,
+		AIFunction10};
 	
-	const auto xnum = 10, ynum=5;
+	// コマンドライン引数の解析(1) 引数の数
+	if(argc <= 4) usage_and_exit();
+	
+	// コマンドライン引数の解析(2) 盤面の大きさ
+	const auto xnum = std::atoi(argv[1]);
+	const auto ynum = std::atoi(argv[2]);
+	if(xnum <= 1 || ynum <= 1) usage_and_exit();
+	
+	// コマンドライン引数の解析(3) 各プレイヤーがどのAIを使うか
+	const int num_players = argc - 3;
+	std::vector< std::function<std::tuple<int,int>(const Board&,int)> > ai(num_players);
+	
+	for(int player = 0; player < num_players; ++player){
+		std::size_t ai_id = static_cast<std::size_t>(std::atoi(argv[player+3]));
+		if(ai_id <= 0 || ai_id > NUM_AI) usage_and_exit();
+		ai[player] = ai_list[ai_id-1];
+		std::cerr << "Player " << player << " plays with AI " << ai_id << "." << std::endl;
+	}
+	
+	// 対戦を実行する
 	Board board = {xnum, ynum};
 	
-	const int num_players = 4;
 	while(true){
 		int player,state;
 		for(player=0;player<num_players;++player) {

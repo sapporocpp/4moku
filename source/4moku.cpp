@@ -7,8 +7,9 @@ constexpr std::size_t NUM_AI = 10;
 // 一度に対戦させられる数
 constexpr std::size_t NUM_PLAY = 8;
 
-// AIを定義したヘッダ
+// ここに使うAIを定義する
 #include "test_ai.hpp"
+#include "random_ai2.hpp"
 #include "ai_winning.hpp"
 
 int Board::operator()(int x, int y) const {
@@ -160,6 +161,7 @@ int main() {
 		},
 		std::bind(&TestAI::operator(), ai1, _1, _2), // std::bindで登録
 		ai_winning, // 関数ポインタで登録
+		random_ai2,
 	};
 
 	const auto xnum = 10, ynum=5;

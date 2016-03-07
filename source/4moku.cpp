@@ -38,6 +38,10 @@ const std::tuple<int,int> Board::size() const {
 	return std::make_tuple(xnum,ynum);
 }
 
+int Board::players() const {
+	return num_players;
+}
+
 void disp(const Board& board) {
 	const std::vector<std::string> marker{"　","◯","□","△","●","■","▲","◇","◆"};
 
@@ -156,11 +160,11 @@ int main() {
 	ai[5] = AIFunction6;
 	ai[6] = AIFunction7;
 	ai[7] = AIFunction8;
+	const int num_players = 4;
 	
 	const auto xnum = 10, ynum=5;
-	Board board = {xnum, ynum};
+	Board board = {xnum, ynum, num_players};
 	
-	const int num_players = 4;
 	while(true){
 		int player,state;
 		for(player=0;player<num_players;++player) {

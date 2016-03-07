@@ -51,6 +51,10 @@ const std::tuple<int,int> Board::size() const {
 	return std::make_tuple(xnum,ynum);
 }
 
+int Board::players() const {
+	return num_players;
+}
+
 void disp(const Board& board) {
 	const std::vector<std::string> marker{"　","◯","□","△","●","■","▲","◇","◆"};
 
@@ -202,6 +206,7 @@ int main(int argc, char ** argv) {
 	
 	// 対戦を実行する
 	Board board = {xnum, ynum};
+	Board board = {xnum, ynum, num_players};
 	
 	while(true){
 		int player,state;

@@ -1,8 +1,9 @@
 ﻿#include "4moku.hpp"
 #include<cstdlib>
 
-// AIを定義したヘッダ
+// ここに使うAIを定義する
 #include "test_ai.hpp"
+#include "random_ai2.hpp"
 #include "ai_winning.hpp"
 
 int Board::operator()(int x, int y) const {
@@ -147,6 +148,7 @@ int main() {
 		},
 		std::bind(&TestAI::operator(), ai1, _1, _2), // std::bindで登録
 		ai_winning, // 関数ポインタで登録
+		random_ai2,
 	};
 
 	const int num_players = ai_list.size();

@@ -2,7 +2,7 @@
 
 // ここに使うAIを定義する
 #define AI_FUNCTION AIFunction1
-#include "test_ai.hpp"
+#include "random_ai2.hpp"
 #undef AI_FUNCTION
 #define AI_FUNCTION AIFunction2
 #include "ai_winning.hpp"
@@ -160,7 +160,7 @@ int main() {
 	ai[5] = AIFunction6;
 	ai[6] = AIFunction7;
 	ai[7] = AIFunction8;
-	const int num_players = 4;
+	const int num_players = 2;
 	
 	const auto xnum = 10, ynum=5;
 	Board board = {xnum, ynum, num_players};

@@ -26,7 +26,7 @@ std::tuple<int,int> random_ai(const Board& board,int /*player*/) {
 
 
 // おける場所を列挙する
-auto get_candidates(const Board& board) {
+std::vector<std::tuple<int,int>> get_candidates(const Board& board) {
 	int nx,ny;
 	std::tie(nx,ny) = board.size();
 

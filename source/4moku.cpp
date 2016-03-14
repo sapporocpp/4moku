@@ -5,6 +5,7 @@
 #include "test_ai.hpp"
 #include "random_ai2.hpp"
 #include "ai_winning.hpp"
+#include "kakutei.hpp"
 
 int Board::operator()(int x, int y) const {
 	return data[x + y*xnum];
@@ -140,15 +141,22 @@ int main() {
 	// クラスで実装した場合はここでインスタンス化
 	auto ai0 = TestAI();
 	auto ai1 = TestAI();
+	auto kakutei_ai1 = Kakutei(3290431);
+	auto kakutei_ai2 = Kakutei(6490645);
 
 	// 使うAIを登録
 	std::vector<std::function<FuncType>> ai_list {
+		/*
 		[&](const Board& board, int player){ // ラムダ式で登録
 			return ai0(board, player);
 		},
 		std::bind(&TestAI::operator(), ai1, _1, _2), // std::bindで登録
 		ai_winning, // 関数ポインタで登録
 		random_ai2,
+		*/
+			[&](const Board& board, int player){ return kakutei_ai1.ai(board, player); },
+			[&](const Board& board, int player){ return kakutei_ai2.ai(board, player); }
+		//std::bind(&TestAI::operator(), ai1, _1, _2)
 	};
 
 	const auto xnum = 10, ynum=5;

@@ -17,22 +17,24 @@ const int FAILED=2;
 
 struct Board {
 	// 空の盤面を生成
-	Board(const int xnum, const int ynum) : 
-		xnum(xnum),ynum(ynum),data(xnum*ynum) 
+	Board(const int xnum, const int ynum, const int num_players) : 
+		xnum(xnum),ynum(ynum),data(xnum*ynum),num_players(num_players)
 	{ }
 	
 	// 他の盤面をコピー
 	Board(const Board& other) : 
-		xnum(other.xnum),ynum(other.ynum),data(other.data) 
+		xnum(other.xnum),ynum(other.ynum),data(other.data),num_players(other.num_players) 
 	{ }
 	
 	int operator()(int x, int y) const;
 	int& operator()(int x, int y);
 	const std::tuple<int,int> size() const;
+	int players() const;
 
 private:
 	std::size_t xnum, ynum;
 	std::vector<int> data;
+	const int num_players;
 };
 
 void disp(const Board& board); // 表示する

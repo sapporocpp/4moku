@@ -7,37 +7,9 @@ constexpr std::size_t NUM_AI = 10;
 // 一度に対戦させられる数
 constexpr std::size_t NUM_PLAY = 8;
 
-// ここに使うAIを定義する
-#define AI_FUNCTION AIFunction1
-#include "kakutei.hpp"
-#undef AI_FUNCTION
-#define AI_FUNCTION AIFunction2
-#include "ignis.hpp"
-#undef AI_FUNCTION
-#define AI_FUNCTION AIFunction3
+// AIを定義したヘッダ
 #include "test_ai.hpp"
-#undef AI_FUNCTION
-#define AI_FUNCTION AIFunction4
-#include "test_ai.hpp"
-#undef AI_FUNCTION
-#define AI_FUNCTION AIFunction5
-#include "test_ai.hpp"
-#undef AI_FUNCTION
-#define AI_FUNCTION AIFunction6
-#include "test_ai.hpp"
-#undef AI_FUNCTION
-#define AI_FUNCTION AIFunction7
-#include "test_ai.hpp"
-#undef AI_FUNCTION
-#define AI_FUNCTION AIFunction8
-#include "test_ai.hpp"
-#undef AI_FUNCTION
-#define AI_FUNCTION AIFunction9
-#include "test_ai.hpp"
-#undef AI_FUNCTION
-#define AI_FUNCTION AIFunction10
-#include "test_ai.hpp"
-#undef AI_FUNCTION
+#include "ai_winning.hpp"
 
 int Board::operator()(int x, int y) const {
 	return data[x + y*xnum];
@@ -49,6 +21,10 @@ int& Board::operator()(int x, int y) {
 
 const std::tuple<int,int> Board::size() const {
 	return std::make_tuple(xnum,ynum);
+}
+
+int Board::players() const {
+	return num_players;
 }
 
 void disp(const Board& board) {
@@ -168,60 +144,50 @@ void usage_and_exit(){
 }
 
 // メイン
-int main(int argc, char ** argv) {
-	std::function<std::tuple<int,int>(const Board&,int)> ai_list[NUM_AI] = {
-		AIFunction1,
-		AIFunction2,
-		AIFunction3,
-		AIFunction4,
-		AIFunction5,
-		AIFunction6,
-		AIFunction7,
-		AIFunction8,
-		AIFunction9,
-		AIFunction10};
+int main() {
+	using FuncType = std::tuple<int,int>(const Board&,int);
+	using std::placeholders::_1;
+	using std::placeholders::_2;
+
+	// クラスで実装した場合はここでインスタンス化
+	auto ai0 = TestAI();
+	auto ai1 = TestAI();
+
+	// 使うAIを登録
+	std::vector<std::function<FuncType>> ai_list {
+		[&](const Board& board, int player){ // ラムダ式で登録
+			return ai0(board, player);
+		},
+		std::bind(&TestAI::operator(), ai1, _1, _2), // std::bindで登録
+		ai_winning, // 関数ポインタで登録
+	};
+
+	const int num_players = ai_list.size();
+	const auto xnum = 10, ynum=5;
+	Board board = {xnum, ynum, num_players};
 	
-	// コマンドライン引数の解析(1) 引数の数
-	if(argc <= 4) usage_and_exit();
-	
-	// コマンドライン引数の解析(2) 盤面の大きさ
-	const auto xnum = std::atoi(argv[1]);
-	const auto ynum = std::atoi(argv[2]);
-	if(xnum <= 1 || ynum <= 1) usage_and_exit();
-	
-	// コマンドライン引数の解析(3) 各プレイヤーがどのAIを使うか
-	const int num_players = argc - 3;
-	std::vector< std::function<std::tuple<int,int>(const Board&,int)> > ai(num_players);
-	
-	for(int player = 0; player < num_players; ++player){
-		std::size_t ai_id = static_cast<std::size_t>(std::atoi(argv[player+3]));
-		if(ai_id <= 0 || ai_id > NUM_AI) usage_and_exit();
-		ai[player] = ai_list[ai_id-1];
-		std::cerr << "Player " << player << " plays with AI " << ai_id << "." << std::endl;
-	}
-	
-	// 対戦を実行する
-	Board board = {xnum, ynum};
-	
-	while(true){
-		int player,state;
-		for(player=0;player<num_players;++player) {
-			state = update(board, player, ai[player]);
-			if(state!=0) {
-				break;
+	// メインループをラムダ式で定義
+	auto main_loop = [&]() {
+		while(true){
+			for(auto player=0;player<num_players;++player) {
+				const auto state = update(board, player, ai_list[player]);
+				disp(board);
+				if(state!=0) {
+					return std::make_pair(player, state);
+				}
 			}
 		}
-		disp(board);
-		std::cout << "-------------------------" << std::endl;
-		if(state!=0) {
-			if(state==WIN) 
-				std::cout << "WIN player: " << player;
-			if(state==FAILED) 
-				std::cout << "FAILED player: " << player;
-			break;
-		}
-	}
+	};
+	int last_player, last_state;
+	std::tie(last_player, last_state) = main_loop(); // メインループを実行してるのはここ
 
+	std::cout << "-------------------------" << std::endl;
+	if(last_state==WIN)
+		std::cout << "WIN player: " << last_player << std::endl;
+	else if(last_state==FAILED)
+		std::cout << "FAILED player: " << last_player << std::endl;
+	else
+		std::cout << "Invalid" << std::endl;
 	return 0;
 }
 

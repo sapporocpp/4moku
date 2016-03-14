@@ -9,10 +9,10 @@ constexpr std::size_t NUM_PLAY = 8;
 
 // ここに使うAIを定義する
 #define AI_FUNCTION AIFunction1
-#include "test_ai.hpp"
+#include "kakutei.hpp"
 #undef AI_FUNCTION
 #define AI_FUNCTION AIFunction2
-#include "ai_winning.hpp"
+#include "ignis.hpp"
 #undef AI_FUNCTION
 #define AI_FUNCTION AIFunction3
 #include "test_ai.hpp"
@@ -52,7 +52,7 @@ const std::tuple<int,int> Board::size() const {
 }
 
 void disp(const Board& board) {
-	const std::vector<std::string> marker{"　","◯","□","△","●","■","▲","◇","◆"};
+	const std::vector<std::string> marker{"  ","A ","B ","C ","D ","E ","F ","G ","H "};
 
 	int nx,ny;
 

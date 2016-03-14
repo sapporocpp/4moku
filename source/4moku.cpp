@@ -1,30 +1,8 @@
 ﻿#include "4moku.hpp"
 
-// ここに使うAIを定義する
-#define AI_FUNCTION AIFunction1
+// AIを定義したヘッダ
 #include "test_ai.hpp"
-#undef AI_FUNCTION
-#define AI_FUNCTION AIFunction2
 #include "ai_winning.hpp"
-#undef AI_FUNCTION
-#define AI_FUNCTION AIFunction3
-#include "test_ai.hpp"
-#undef AI_FUNCTION
-#define AI_FUNCTION AIFunction4
-#include "test_ai.hpp"
-#undef AI_FUNCTION
-#define AI_FUNCTION AIFunction5
-#include "test_ai.hpp"
-#undef AI_FUNCTION
-#define AI_FUNCTION AIFunction6
-#include "test_ai.hpp"
-#undef AI_FUNCTION
-#define AI_FUNCTION AIFunction7
-#include "test_ai.hpp"
-#undef AI_FUNCTION
-#define AI_FUNCTION AIFunction8
-#include "test_ai.hpp"
-#undef AI_FUNCTION
 
 int Board::operator()(int x, int y) const {
 	return data[x + y*xnum];
@@ -147,39 +125,49 @@ int update(Board& board,const int player,
 
 // メイン
 int main() {
-	std::function<std::tuple<int,int>(const Board&,int)> ai[8];
-	ai[0] = AIFunction1;
-	ai[1] = AIFunction2;
-	ai[2] = AIFunction3;
-	ai[3] = AIFunction4;
-	ai[4] = AIFunction5;
-	ai[5] = AIFunction6;
-	ai[6] = AIFunction7;
-	ai[7] = AIFunction8;
-	
+	using FuncType = std::tuple<int,int>(const Board&,int);
+	using std::placeholders::_1;
+	using std::placeholders::_2;
+
+	// クラスで実装した場合はここでインスタンス化
+	auto ai0 = TestAI();
+	auto ai1 = TestAI();
+
+	// 使うAIを登録
+	std::vector<std::function<FuncType>> ai_list {
+		[&](const Board& board, int player){ // ラムダ式で登録
+			return ai0(board, player);
+		},
+		std::bind(&TestAI::operator(), ai1, _1, _2), // std::bindで登録
+		ai_winning, // 関数ポインタで登録
+	};
+
 	const auto xnum = 10, ynum=5;
 	Board board = {xnum, ynum};
 	
-	const int num_players = 4;
-	while(true){
-		int player,state;
-		for(player=0;player<num_players;++player) {
-			state = update(board, player, ai[player]);
-			if(state!=0) {
-				break;
+	// メインループをラムダ式で定義
+	auto main_loop = [&]() {
+		const auto num_players = ai_list.size();
+		while(true){
+			for(auto player=0u;player<num_players;++player) {
+				const auto state = update(board, player, ai_list[player]);
+				disp(board);
+				if(state!=0) {
+					return std::make_pair(player, state);
+				}
 			}
 		}
-		disp(board);
-		std::cout << "-------------------------" << std::endl;
-		if(state!=0) {
-			if(state==WIN) 
-				std::cout << "WIN player: " << player;
-			if(state==FAILED) 
-				std::cout << "FAILED player: " << player;
-			break;
-		}
-	}
+	};
+	int last_player, last_state;
+	std::tie(last_player, last_state) = main_loop(); // メインループを実行してるのはここ
 
+	std::cout << "-------------------------" << std::endl;
+	if(last_state==WIN)
+		std::cout << "WIN player: " << last_player << std::endl;
+	else if(last_state==FAILED)
+		std::cout << "FAILED player: " << last_player << std::endl;
+	else
+		std::cout << "Invalid" << std::endl;
 	return 0;
 }
 

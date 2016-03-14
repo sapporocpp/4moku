@@ -1,6 +1,6 @@
 #include "4moku.hpp"
 
-std::tuple<int,int> AI_FUNCTION(const Board& board,int player) {
+std::tuple<int,int> ai_winning(const Board& board,int player) {
     // 自分が勝つことが確定するような置き場所があるならそこに置く。
     // そうでなければランダムに置く。
     

@@ -1,13 +1,7 @@
 ﻿#include "4moku.hpp"
 #include<cstdlib>
 
-// 定義されているAIの数
-constexpr std::size_t NUM_AI = 10;
-
-// 一度に対戦させられる数
-constexpr std::size_t NUM_PLAY = 8;
-
-// ここに使うAIを定義する
+// AIを定義したヘッダ
 #include "test_ai.hpp"
 #include "random_ai2.hpp"
 #include "ai_winning.hpp"
@@ -133,15 +127,6 @@ int update(Board& board,const int player,
 	}
 	
 	return 0;
-}
-
-// コマンドライン引数の説明を表示して終了
-void usage_and_exit(){
-	std::cerr << "Usage: 4moku [SIZE_X] [SIZE_Y] [AI_ID1] [AI_ID2] ..." << std::endl;
-	std::cerr << "    Specify [SIZE_X] and [SIZE_Y] with integers 2 or larger." << std::endl;
-	std::cerr << "    Specify every [AI_ID#] with an integer between 1 to " << NUM_AI << "." << std::endl;
-	std::cerr << "    Example: 4moku 5 2 1 3 1 2" << std::endl;
-	std::exit(-1);
 }
 
 // メイン

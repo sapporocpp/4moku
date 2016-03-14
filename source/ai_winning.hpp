@@ -1,4 +1,5 @@
 #include "4moku.hpp"
+#include <ctime>
 
 std::tuple<int,int> AI_FUNCTION(const Board& board,int player) {
     // 自分が勝つことが確定するような置き場所があるならそこに置く。
@@ -7,8 +8,7 @@ std::tuple<int,int> AI_FUNCTION(const Board& board,int player) {
 	int nx,ny;
 	std::tie(nx,ny) = board.size();
 
-	std::random_device rd;
-	std::mt19937 mt(rd());
+	std::mt19937 mt(std::time(0));
 	std::uniform_int_distribution<> rndx(0,nx);
 	std::uniform_int_distribution<> rndy(0,ny);
 	

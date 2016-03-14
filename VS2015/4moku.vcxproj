@@ -21,6 +21,11 @@
   <ItemGroup>
     <ClCompile Include="..\source\4moku.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\source\4moku.hpp" />
+    <ClInclude Include="..\source\ai_winning.hpp" />
+    <ClInclude Include="..\source\test_ai.hpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{D92E65B4-6D1C-4DFF-84FD-3BEBE60A1927}</ProjectGuid>
     <RootNamespace>My4moku</RootNamespace>

@@ -16,6 +16,10 @@ const std::tuple<int,int> Board::size() const {
 	return std::make_tuple(xnum,ynum);
 }
 
+int Board::players() const {
+	return num_players;
+}
+
 void disp(const Board& board) {
 	const std::vector<std::string> marker{"　","◯","□","△","●","■","▲","◇","◆"};
 
@@ -142,14 +146,14 @@ int main() {
 		ai_winning, // 関数ポインタで登録
 	};
 
+	const int num_players = ai_list.size();
 	const auto xnum = 10, ynum=5;
-	Board board = {xnum, ynum};
+	Board board = {xnum, ynum, num_players};
 	
 	// メインループをラムダ式で定義
 	auto main_loop = [&]() {
-		const auto num_players = ai_list.size();
 		while(true){
-			for(auto player=0u;player<num_players;++player) {
+			for(auto player=0;player<num_players;++player) {
 				const auto state = update(board, player, ai_list[player]);
 				disp(board);
 				if(state!=0) {

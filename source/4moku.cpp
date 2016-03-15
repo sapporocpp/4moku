@@ -113,9 +113,7 @@ int update(Board& board,const int player,
 			std::function<std::tuple<int,int>(const Board&,int)> ai_function) 
 {
 	int x,y;
-	
-	Board board_tmp(board);
-	std::tie(x,y) = ai_function(board_tmp,player);
+	std::tie(x,y) = ai_function(board,player);
 	if(placeable(board,x,y)) {
 		board(x,y) = player_id(player);
 	}

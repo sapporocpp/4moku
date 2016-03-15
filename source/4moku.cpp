@@ -1,7 +1,7 @@
 ﻿#include "4moku.hpp"
 #include<cstdlib>
 
-// ここに使うAIを定義する
+// AIを定義したヘッダ
 #include "test_ai.hpp"
 #include "random_ai2.hpp"
 #include "ai_winning.hpp"
@@ -159,14 +159,15 @@ int main() {
 		//std::bind(&TestAI::operator(), ai1, _1, _2)
 	};
 
-	const int num_players = ai_list.size();
 	const auto xnum = 10, ynum=5;
+	Board board = {xnum, ynum};
 	Board board = {xnum, ynum, num_players};
 	
 	// メインループをラムダ式で定義
 	auto main_loop = [&]() {
+		const auto num_players = ai_list.size();
 		while(true){
-			for(auto player=0;player<num_players;++player) {
+			for(auto player=0u;player<num_players;++player) {
 				const auto state = update(board, player, ai_list[player]);
 				disp(board);
 				if(state!=0) {

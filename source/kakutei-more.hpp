@@ -39,7 +39,10 @@ public:
 	struct AIresult{
 		int winner;
 		// 勝敗。
-		// 0：未確定、正の数：その手数先で自分の勝ち、負の数：その手数先で他のプレイヤーの勝ち
+		// 0：未確定
+		// 正の数：(SIMULATED_MOVES - winner + 1)手先で自分の勝ち
+		// 負の数：(SIMULATED_MOVES - |winner| + 1)手先で他のプレイヤーの勝ち
+		// この数が多い手を優先的に選ぶ。
 		
 		std::tuple<int, int> position; // 置く場所
 		
@@ -60,7 +63,7 @@ public:
 	};
 	
 	// AIの実質的な内容
-	AIresult think(const Board& board, int this_player, size_t depth){
+	AIresult think(const Board& board, int this_player, size_t remained_depth){
 		int nx, ny;
 		std::tie(nx, ny) = board.size();
 		
@@ -77,11 +80,11 @@ public:
 			Board b_tmp(board);
 			b_tmp(i, j) = player_id(this_player);
 			if(finished(b_tmp) == player_id(this_player)){
-if(depth == 0){
+if(remained_depth == SIMULATED_MOVES){
 std::cerr << "Player " << this_player << " can win by placing at ("
 	<< i << ", " << j << ")!" << std::endl;
 }
-				return AIresult(depth, i, j);
+				return AIresult(remained_depth, i, j);
 			}
 			
 			// 二手目以降（各相手プレイヤーについて試す）
@@ -100,7 +103,7 @@ std::cerr << "Player " << this_player << " can win by placing at ("
 						Board b_tmp(b);
 						b_tmp(i1, j1) = player_id(simulated_player);
 						if(finished(b_tmp) == player_id(simulated_player)){
-if(depth == 0){
+if(remained_depth == SIMULATED_MOVES){
 std::cerr << "Player " << this_player << ": Placing at ("
 	<< i << ", " << j << ") lets the player " << simulated_player << " win!" << std::endl;
 }
@@ -133,12 +136,12 @@ std::cerr << "Player " << this_player << ": Placing at ("
 			// また、もし先読みができない場合は、「この時点で先読み候補が残っていれば」
 			// uncertain_positionsに加えればよい。
 			if(!won_by_other){
-				if(depth < SIMULATED_MOVES){
+				if(remained_depth > 1){
 					// まだ深く探索してもよいのであれば
 					// まだ残っている各可能性について検討する
 					size_t num_winning = 0, num_uncertain = 0, num_losing = 0;
 					for(auto cand = current_candidates.begin(); cand != current_candidates.end(); ++cand){
-						AIresult res = think(cand->board, this_player, depth+1);
+						AIresult res = think(cand->board, this_player, remained_depth-1);
 						if(res.winner < 0){
 							++num_losing;
 							break;
@@ -151,14 +154,14 @@ std::cerr << "Player " << this_player << ": Placing at ("
 					
 					if(num_winning == current_candidates.size()){
 						// 相手がどの手を指しても勝てる場合
-if(depth == 0){
+if(remained_depth == SIMULATED_MOVES){
 std::cerr << "Player " << this_player << " can win by placing at ("
 << i << ", " << j << ")! (*)" << std::endl;
 }
-						future_winning_positions.push_back(AIresult(depth, i, j));
+						future_winning_positions.push_back(AIresult(remained_depth, i, j));
 					}else if(num_losing > 0){
 						// 自分の負けを確定させる手を相手が持っている場合（何もしない）
-if(depth == 0){
+if(remained_depth == SIMULATED_MOVES){
 std::cerr << "Player " << this_player << ": Placing at ("
 << i << ", " << j << ") lets another player win! (*)" << std::endl;
 }
@@ -183,7 +186,7 @@ std::cerr << "Player " << this_player << ": Placing at ("
 		
 		// 勝敗の確定しない手があるなら、それをランダムに一つ返す
 		if(!(uncertain_positions.empty())){
-			if(depth == 0){
+			if(remained_depth == SIMULATED_MOVES){
 				double num_candidates = 0.0;
 				
 				for(size_t i = 0; i < uncertain_positions.size(); ++i){
@@ -207,7 +210,7 @@ std::cerr << "Player " << this_player << ": Placing at ("
 				num_candidates += 1.0;
 				double r = rnd(mt);
 				if(r <= 1.0 / num_candidates){
-					final_result = AIresult(-1, i, j);
+					final_result = AIresult(-remained_depth, i, j);
 				}
 				return true;
 			});
@@ -217,7 +220,7 @@ std::cerr << "Player " << this_player << ": Placing at ("
 	
 	// AIの内容
 	std::tuple<int, int> ai(const Board& board, int player) {
-		AIresult th = think(board, player, 0);
+		AIresult th = think(board, player, SIMULATED_MOVES);
 		return th.position;
 	}
 };

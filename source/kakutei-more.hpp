@@ -1,13 +1,14 @@
 #include "4moku.hpp"
 #include <deque>
 
+// #define KAKUTEI_MORE_DEBUG
+
 template<size_t SIMULATED_MOVES> struct KakuteiMore{
 	// SIMULATED_MOVES は、先読みする手数
 	
 private:
 	std::mt19937 mt;
 	std::uniform_real_distribution<double> rnd;
-	std::tuple<int,int> final_result;
 	
 public:
 	// コンストラクタでは、乱数生成に必要なものを初期化しておく
@@ -67,12 +68,12 @@ public:
 		int nx, ny;
 		std::tie(nx, ny) = board.size();
 		
-		AIresult final_result;
-		std::deque<std::tuple<int, int>> uncertain_positions;
-		std::deque<AIresult> future_winning_positions;
+		std::deque<AIresult> position2score;
+		//std::deque<std::tuple<int, int>> uncertain_positions;
+		//std::deque<AIresult> future_winning_positions;
 		
 		// 一手目（自分の手）
-		//try_for_placeable(board, [&](const Board & b, int i, int j){
+		//try_for_placeable(board, [&](const Board & b, int i, int j){ ... });
 		for(int i = 0; i < nx; ++i){ for(int j = 0; j < ny; ++j){
 			if(!placeable(board, i, j)) continue;
 			
@@ -80,10 +81,12 @@ public:
 			Board b_tmp(board);
 			b_tmp(i, j) = player_id(this_player);
 			if(finished(b_tmp) == player_id(this_player)){
-if(remained_depth == SIMULATED_MOVES){
-std::cerr << "Player " << this_player << " can win by placing at ("
-	<< i << ", " << j << ")!" << std::endl;
-}
+#ifdef KAKUTEI_MORE_DEBUG
+			if(remained_depth == SIMULATED_MOVES){
+				std::cerr << "Player " << this_player << " can win by placing at ("
+				<< i << ", " << j << ")!" << std::endl;
+			}
+#endif // KAKUTEI_MORE_DEBUG
 				return AIresult(remained_depth, i, j);
 			}
 			
@@ -103,10 +106,13 @@ std::cerr << "Player " << this_player << " can win by placing at ("
 						Board b_tmp(b);
 						b_tmp(i1, j1) = player_id(simulated_player);
 						if(finished(b_tmp) == player_id(simulated_player)){
-if(remained_depth == SIMULATED_MOVES){
-std::cerr << "Player " << this_player << ": Placing at ("
-	<< i << ", " << j << ") lets the player " << simulated_player << " win!" << std::endl;
-}
+#ifdef KAKUTEI_MORE_DEBUG
+							if(remained_depth == SIMULATED_MOVES){
+								std::cerr << "Player " << this_player << ": Placing at ("
+								<< i << ", " << j << ") lets the player " << simulated_player << " win!" << std::endl;
+							}
+#endif // KAKUTEI_MORE_DEBUG
+							
 							// 他のプレイヤーの勝ち
 							// （その手は指せない、というフラグを立てる）
 							won_by_other = true;
@@ -124,98 +130,73 @@ std::cerr << "Player " << this_player << ": Placing at ("
 				next_candidates.clear();
 			}
 			
-			// 可能性についての確認。
-			// 自分の負けが確定といえるのは
-			// ・この時点の先読みで負けが確定した場合
-			// ・次の段階の先読みで、すべての手で負けることが確定した場合
-			// のどちらかに該当する場合である。
-			// よって、この時点で負けておらず、かつ次の先読みをして負けない手があれば
-			// uncertain_positionsに加える。
-			// なお、次の先読みで勝てると決まった場合はそのままfinal_resultに加える。
-			// 
-			// また、もし先読みができない場合は、「この時点で先読み候補が残っていれば」
-			// uncertain_positionsに加えればよい。
+			// この時点で決着が付かない場合、まだ先読みできる手数が残っているならば
+			// 先読みする。
 			if(!won_by_other){
 				if(remained_depth > 1){
 					// まだ深く探索してもよいのであれば
-					// まだ残っている各可能性について検討する
-					size_t num_winning = 0, num_uncertain = 0, num_losing = 0;
+					// まだ残っている各可能性について検討する。
+					// これは、相手の手それぞれについてループするものなので、
+					// スコアは最悪のケースで評価しないとならない。
+					int opponents_best_score = SIMULATED_MOVES;
 					for(auto cand = current_candidates.begin(); cand != current_candidates.end(); ++cand){
 						AIresult res = think(cand->board, this_player, remained_depth-1);
-						if(res.winner < 0){
-							++num_losing;
-							break;
-						}else if(res.winner > 0){
-							++num_winning;
-						}else{
-							++num_uncertain;
+						if(res.winner < opponents_best_score){
+							opponents_best_score = res.winner;
 						}
 					}
 					
-					if(num_winning == current_candidates.size()){
-						// 相手がどの手を指しても勝てる場合
-if(remained_depth == SIMULATED_MOVES){
-std::cerr << "Player " << this_player << " can win by placing at ("
-<< i << ", " << j << ")! (*)" << std::endl;
-}
-						future_winning_positions.push_back(AIresult(remained_depth, i, j));
-					}else if(num_losing > 0){
-						// 自分の負けを確定させる手を相手が持っている場合（何もしない）
-if(remained_depth == SIMULATED_MOVES){
-std::cerr << "Player " << this_player << ": Placing at ("
-<< i << ", " << j << ") lets another player win! (*)" << std::endl;
-}
-					}else{
-						// 未確定の場合（未確定リストに入れる）
-						uncertain_positions.push_back(std::make_tuple(i, j));
-					}
+					position2score.emplace_back(opponents_best_score, i, j);
 				}else{
-					// もうこれ以上の先読みができない場合（未確定リストに入れる）
-					if(!(current_candidates.empty())){
-						uncertain_positions.push_back(std::make_tuple(i, j));
-					}
+					// もうこれ以上の先読みができない場合（勝敗は不明）
+					position2score.emplace_back(0, i, j);
 				}
+			}else{
+				// 相手の勝ちが確定
+				position2score.emplace_back(-remained_depth, i, j);
 			}
 		}} // 「一手目」ループの終わり
 		
-		// いまの手ではないが、この先に勝てる手がある場合
-		if(!(future_winning_positions.empty())){
-			// TODO: もっとも早く勝てる手を選ぶ
-			return future_winning_positions.front();
+		// 候補として残ったもののうち、最善のものを返す
+		if(position2score.empty()){
+			// 候補がもうない（＝盤面が埋まっている）ならば
+#ifdef KAKUTEI_MORE_DEBUG
+			if(remained_depth == SIMULATED_MOVES){
+				std::cerr << "No place remained!" << std::endl;
+			}
+#endif // KAKUTEI_MORE_DEBUG
+			return AIresult(0, -1, -1);
 		}
 		
-		// 勝敗の確定しない手があるなら、それをランダムに一つ返す
-		if(!(uncertain_positions.empty())){
-			if(remained_depth == SIMULATED_MOVES){
-				double num_candidates = 0.0;
-				
-				for(size_t i = 0; i < uncertain_positions.size(); ++i){
-					num_candidates += 1.0;
-					double r = rnd(mt);
-					if(r <= 1.0 / num_candidates){
-						final_result = AIresult(0, uncertain_positions[i]);
-					}
-				}
-				return final_result;
+		int best_score = -(static_cast<int>(SIMULATED_MOVES)+1);
+		double count_for_current_score = 0.0; // 今のスコアの手がいくつあるか
+		AIresult chosen;
+		
+		for(auto it = position2score.begin(); it != position2score.end(); ++it){
+			if(it->winner < best_score){
+				// この手が、すでに選ばれている手よりも悪い場合
+				continue;
+			}
+			
+			if(it->winner > best_score){
+				best_score = it->winner;
+				count_for_current_score = 1.0;
 			}else{
-				return AIresult(0, uncertain_positions.front());
+				count_for_current_score += 1.0;
+			}
+			
+			double r = rnd(mt);
+			if(r <= 1.0 / count_for_current_score){
+				chosen = *it;
 			}
 		}
-		
-		// それもないなら、負ける手を返す
-		{
-			double num_candidates = 0.0;
-			
-			try_for_placeable(board, [&](const Board & /* b */, int i, int j){
-				num_candidates += 1.0;
-				double r = rnd(mt);
-				if(r <= 1.0 / num_candidates){
-					final_result = AIresult(-remained_depth, i, j);
-				}
-				return true;
-			});
-			return final_result;
+#ifdef KAKUTEI_MORE_DEBUG
+		if(remained_depth == SIMULATED_MOVES && best_score > 0){
+			std::cerr << "Player " << this_player << " can win by placing at ("
+			<< std::get<0>(chosen.position) << ", " << std::get<1>(chosen.position) << ")! (*)" << std::endl;
 		}
+#endif // KAKUTEI_MORE_DEBUG
+		return chosen;
 	}
 	
 	// AIの内容

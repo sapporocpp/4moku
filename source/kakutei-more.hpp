@@ -142,7 +142,8 @@ public:
 					これは、相手の手それぞれについてループするものなので、
 					スコアは最悪のケースで評価しないとならない。
 					*/
-					int opponents_best_score = SIMULATED_MOVES;
+
+					int opponents_best_score = static_cast<int>(SIMULATED_MOVES);
 					for(auto cand = current_candidates.begin(); cand != current_candidates.end(); ++cand){
 						AIresult res = think(cand->board, this_player, remained_depth-1);
 						if(res.winner < opponents_best_score){
@@ -220,7 +221,7 @@ public:
 		2. 自分の石が2つ連続して並ぶ
 		以上の順で優先的に選ぶ。
 		*/
-		return chosen;
+		return AIresult(0, uncertain_positions.front());
 		/*
 		for(auto it = uncertain_positions.begin(); it != uncertain_positions.end(); ++it){
 			Board b_tmp(board);

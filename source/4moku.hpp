@@ -40,7 +40,6 @@ private:
 	int num_players;
 };
 
-void disp(const Board& board); // 表示する
 int player_id(int player); // プレイヤー番号
 bool placeable(const Board& board, int x, int y); // その場所に置けるか判定
 int finished(const Board& board); // 決着がついたか判定

@@ -187,13 +187,13 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\source\4moku.cpp" />
-    <ClCompile Include="..\..\source\OF4mokuMain.cpp" />
-    <ClCompile Include="..\..\source\OF4mokuWindow.cpp" />
+    <ClCompile Include="..\source\4moku.cpp" />
+    <ClCompile Include="..\source\OF4mokuMain.cpp" />
+    <ClCompile Include="..\source\OF4mokuWindow.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\source\4moku.hpp" />
-    <ClInclude Include="..\..\source\OF4mokuWindow.h" />
+    <ClInclude Include="..\source\4moku.hpp" />
+    <ClInclude Include="..\source\OF4mokuWindow.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ProjectExtensions>

@@ -12,8 +12,9 @@ private:
 	
 public:
 	// コンストラクタでは、乱数生成に必要なものを初期化しておく
+	KakuteiMore() : mt(std::time(0)), rnd(0.0, 1.0) {}
 	KakuteiMore(int seed) : mt(seed + std::time(0)), rnd(0.0, 1.0) {}
-	
+
 	// ヘルパー関数：
 	// 盤面のうち置ける場所すべてについて繰り返す
 	// falseを返した場合その時点で打ち切る

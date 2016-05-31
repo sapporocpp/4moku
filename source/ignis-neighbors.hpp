@@ -1,5 +1,5 @@
 #include "4moku.hpp"
-std::tuple<int,int> AI_FUNCTION(const Board& board,int player) {
+std::tuple<int,int> AI_Neighbors(const Board& board,int player) {
     int nx,ny;
     std::tie(nx,ny) = board.size();
     std::random_device rd;

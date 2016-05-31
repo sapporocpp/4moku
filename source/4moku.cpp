@@ -2,10 +2,22 @@
 #include<cstdlib>
 
 // ここに使うAIを定義する
+#if 0
 #include "test_ai.hpp"
 #include "random_ai2.hpp"
 #include "ai_winning.hpp"
 #include "kakutei.hpp"
+#include "ignis-neighbors.hpp"
+#include "kakutei-more.hpp"
+#endif
+
+void Board::reset(const int n_x, const int n_y, const int n_players) {
+	xnum = n_x;
+	ynum = n_y;
+	data.clear();
+	data.assign(xnum*ynum, 0);
+	num_players = n_players;
+}
 
 int Board::operator()(int x, int y) const {
 	return data[x + y*xnum];
@@ -15,8 +27,16 @@ int& Board::operator()(int x, int y) {
 	return data[x + y*xnum];
 }
 
-const std::tuple<int,int> Board::size() const {
-	return std::make_tuple(xnum,ynum);
+const std::tuple<int, int> Board::size() const {
+	return std::make_tuple(xnum, ynum);
+}
+
+std::size_t Board::size_x() const {
+	return xnum;
+}
+
+std::size_t Board::size_y() const {
+	return ynum;
 }
 
 int Board::players() const {
@@ -133,6 +153,7 @@ int update(Board& board,const int player,
 }
 
 // メイン
+#if 0
 int main() {
 	using FuncType = std::tuple<int,int>(const Board&,int);
 	using std::placeholders::_1;
@@ -187,4 +208,4 @@ int main() {
 		std::cout << "Invalid" << std::endl;
 	return 0;
 }
-
+#endif

@@ -26,15 +26,18 @@ struct Board {
 		xnum(other.xnum),ynum(other.ynum),data(other.data),num_players(other.num_players) 
 	{ }
 	
+	void reset(const int n_x, const int n_y, const int n_players);
 	int operator()(int x, int y) const;
 	int& operator()(int x, int y);
 	const std::tuple<int,int> size() const;
+	std::size_t size_x() const;
+	std::size_t size_y() const;
 	int players() const;
 
 private:
 	std::size_t xnum, ynum;
 	std::vector<int> data;
-	const int num_players;
+	int num_players;
 };
 
 void disp(const Board& board); // 表示する

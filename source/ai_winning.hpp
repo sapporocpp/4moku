@@ -1,9 +1,9 @@
-#include "4moku.hpp"
+﻿#include "4moku.hpp"
 #include <ctime>
 
 std::tuple<int,int> ai_winning(const Board& board,int player) {
-    /* 自分が勝つことが確定するような置き場所があるならそこに置く。 */
-    /* そうでなければランダムに置く。 */
+    // 自分が勝つことが確定するような置き場所があるならそこに置く。
+    // そうでなければランダムに置く。
     
 	int nx,ny;
 	std::tie(nx,ny) = board.size();
@@ -17,15 +17,15 @@ std::tuple<int,int> ai_winning(const Board& board,int player) {
 	for(int i=0;i<300;++i) {
 		int x=rndx(mt), y=rndy(mt);
 		if(placeable(board, x, y)){
-			/* 置けるなら */
+			// 置けるなら
 			Board board_tmp(board);
 			board_tmp(x,y) = player_id(player);
 			
 			if(finished(board_tmp)){
-				/* そこに置いて勝つなら */
+				// そこに置いて勝つなら
 				return std::make_tuple(x,y);
 			}else{
-				/* そうでないなら */
+				// そうでないなら
 				if(std::get<0>(random_choice) == -1){
 					random_choice = std::make_tuple(x,y);
 				}

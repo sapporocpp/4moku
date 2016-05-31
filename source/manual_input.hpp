@@ -1,4 +1,4 @@
-#include "4moku.hpp"
+﻿#include "4moku.hpp"
 #include <cstdlib>
 
 struct ManualInput{
@@ -15,7 +15,7 @@ struct ManualInput{
 		return std::make_tuple(x, y);
 	}
 	
-	/* AIの内容 */
+	// AIの内容
 	std::tuple<int, int> ai(const Board& board, int player) const{
 		std::string input;
 		std::tuple<int, int> result;

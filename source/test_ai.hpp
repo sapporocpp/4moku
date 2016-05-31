@@ -1,4 +1,4 @@
-#include "4moku.hpp"
+﻿#include "4moku.hpp"
 
 struct TestAI {
 

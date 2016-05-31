@@ -1,22 +1,22 @@
-#include "4moku.hpp"
+ï»¿#include "4moku.hpp"
 #include <deque>
 
 // #define KAKUTEI_MORE_DEBUG
 
 template<size_t SIMULATED_MOVES> struct KakuteiMore{
-	// SIMULATED_MOVES ‚ÍAæ“Ç‚İ‚·‚éè”
+	// SIMULATED_MOVES ã¯ã€å…ˆèª­ã¿ã™ã‚‹æ‰‹æ•°
 	
 private:
 	std::mt19937 mt;
 	std::uniform_real_distribution<double> rnd;
 	
 public:
-	// ƒRƒ“ƒXƒgƒ‰ƒNƒ^‚Å‚ÍA—”¶¬‚É•K—v‚È‚à‚Ì‚ğ‰Šú‰»‚µ‚Ä‚¨‚­
+	// ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ã§ã¯ã€ä¹±æ•°ç”Ÿæˆã«å¿…è¦ãªã‚‚ã®ã‚’åˆæœŸåŒ–ã—ã¦ãŠã
 	KakuteiMore(int seed) : mt(seed + std::time(0)), rnd(0.0, 1.0) {}
 	
-	// ƒwƒ‹ƒp[ŠÖ”F
-	// ”Õ–Ê‚Ì‚¤‚¿’u‚¯‚éêŠ‚·‚×‚Ä‚É‚Â‚¢‚ÄŒJ‚è•Ô‚·
-	// false‚ğ•Ô‚µ‚½ê‡‚»‚Ì“_‚Å‘Å‚¿Ø‚é
+	// ãƒ˜ãƒ«ãƒ‘ãƒ¼é–¢æ•°ï¼š
+	// ç›¤é¢ã®ã†ã¡ç½®ã‘ã‚‹å ´æ‰€ã™ã¹ã¦ã«ã¤ã„ã¦ç¹°ã‚Šè¿”ã™
+	// falseã‚’è¿”ã—ãŸå ´åˆãã®æ™‚ç‚¹ã§æ‰“ã¡åˆ‡ã‚‹
 	template <class FUNCTYPE>
 	void try_for_placeable(const Board & board, const FUNCTYPE & func){
 		bool break_loop = false;
@@ -36,16 +36,16 @@ public:
 		}
 	}
 	
-	// AI‚Ìæ“Ç‚İ‚ÌŒ‹‰Ê
+	// AIã®å…ˆèª­ã¿ã®çµæœ
 	struct AIresult{
 		int winner;
-		// Ÿ”sB
-		// 0F–¢Šm’è
-		// ³‚Ì”F(SIMULATED_MOVES - winner + 1)èæ‚Å©•ª‚ÌŸ‚¿
-		// •‰‚Ì”F(SIMULATED_MOVES - |winner| + 1)èæ‚Å‘¼‚ÌƒvƒŒƒCƒ„[‚ÌŸ‚¿
-		// ‚±‚Ì”‚ª‘½‚¢è‚ğ—Dæ“I‚É‘I‚ÔB
+		// å‹æ•—ã€‚
+		// 0ï¼šæœªç¢ºå®š
+		// æ­£ã®æ•°ï¼š(SIMULATED_MOVES - winner + 1)æ‰‹å…ˆã§è‡ªåˆ†ã®å‹ã¡
+		// è² ã®æ•°ï¼š(SIMULATED_MOVES - |winner| + 1)æ‰‹å…ˆã§ä»–ã®ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®å‹ã¡
+		// ã“ã®æ•°ãŒå¤šã„æ‰‹ã‚’å„ªå…ˆçš„ã«é¸ã¶ã€‚
 		
-		std::tuple<int, int> position; // ’u‚­êŠ
+		std::tuple<int, int> position; // ç½®ãå ´æ‰€
 		
 		AIresult() : winner(0), position(std::make_tuple(-1, -1)) {}
 		AIresult(int win, const std::tuple<int, int> & pos) : winner(win), position(pos) {}
@@ -56,14 +56,14 @@ public:
 		}
 	};
 	
-	// ƒwƒ‹ƒp[ƒNƒ‰ƒXF©•ª‚Ìw‚µè‚ÆAæ“Ç‚İ‚µ‚Ä‚¢‚éè‚ÌŠÖŒW
+	// ãƒ˜ãƒ«ãƒ‘ãƒ¼ã‚¯ãƒ©ã‚¹ï¼šè‡ªåˆ†ã®æŒ‡ã—æ‰‹ã¨ã€å…ˆèª­ã¿ã—ã¦ã„ã‚‹æ‰‹ã®é–¢ä¿‚
 	struct BoardCandidate{
 		Board board;
 		AIresult choice;
 		BoardCandidate(const Board & b, const AIresult & c) : board(b), choice(c) {}
 	};
 	
-	// AI‚ÌÀ¿“I‚È“à—e
+	// AIã®å®Ÿè³ªçš„ãªå†…å®¹
 	AIresult think(const Board& board, int this_player, size_t remained_depth){
 		int nx, ny;
 		std::tie(nx, ny) = board.size();
@@ -72,12 +72,12 @@ public:
 		//std::deque<std::tuple<int, int>> uncertain_positions;
 		//std::deque<AIresult> future_winning_positions;
 		
-		// ˆêè–Úi©•ª‚Ìèj
+		// ä¸€æ‰‹ç›®ï¼ˆè‡ªåˆ†ã®æ‰‹ï¼‰
 		//try_for_placeable(board, [&](const Board & b, int i, int j){ ... });
 		for(int i = 0; i < nx; ++i){ for(int j = 0; j < ny; ++j){
 			if(!placeable(board, i, j)) continue;
 			
-			// ‚»‚±‚É’u‚­‚±‚Æ‚ÅŸ‚¿‚ªŠm’è‚·‚éH
+			// ãã“ã«ç½®ãã“ã¨ã§å‹ã¡ãŒç¢ºå®šã™ã‚‹ï¼Ÿ
 			Board b_tmp(board);
 			b_tmp(i, j) = player_id(this_player);
 			if(finished(b_tmp) == player_id(this_player)){
@@ -90,19 +90,19 @@ public:
 				return AIresult(remained_depth, i, j);
 			}
 			
-			// “ñè–ÚˆÈ~iŠe‘ŠèƒvƒŒƒCƒ„[‚É‚Â‚¢‚Ä‚·j
+			// äºŒæ‰‹ç›®ä»¥é™ï¼ˆå„ç›¸æ‰‹ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã«ã¤ã„ã¦è©¦ã™ï¼‰
 			std::deque<BoardCandidate> current_candidates, next_candidates;
 			current_candidates.emplace_back(b_tmp, AIresult(0, i, j));
 			bool won_by_other = false;
 			
 			for(int moves = 1; moves < board.players(); ++moves){
-				// ’N‚ªè‚ğ‘I‚Ô‚©
+				// èª°ãŒæ‰‹ã‚’é¸ã¶ã‹
 				const int simulated_player = (this_player + moves) % board.players();
 				
-				// Œ»İ‰Â”\«‚Ì‚ ‚é‚·‚×‚Ä‚Ìè‚É‚Â‚¢‚Ä’²‚×‚é
+				// ç¾åœ¨å¯èƒ½æ€§ã®ã‚ã‚‹ã™ã¹ã¦ã®æ‰‹ã«ã¤ã„ã¦èª¿ã¹ã‚‹
 				for(auto cand = current_candidates.begin(); cand != current_candidates.end(); ++cand){
 					try_for_placeable(cand->board, [&](const Board & b, int i1, int j1){
-						// ‚»‚±‚É’u‚­‚±‚Æ‚Å‘Šè‚ÌŸ‚¿‚ªŠm’è‚·‚éH
+						// ãã“ã«ç½®ãã“ã¨ã§ç›¸æ‰‹ã®å‹ã¡ãŒç¢ºå®šã™ã‚‹ï¼Ÿ
 						Board b_tmp(b);
 						b_tmp(i1, j1) = player_id(simulated_player);
 						if(finished(b_tmp) == player_id(simulated_player)){
@@ -113,12 +113,12 @@ public:
 							}
 #endif // KAKUTEI_MORE_DEBUG
 							
-							// ‘¼‚ÌƒvƒŒƒCƒ„[‚ÌŸ‚¿
-							// i‚»‚Ìè‚Íw‚¹‚È‚¢A‚Æ‚¢‚¤ƒtƒ‰ƒO‚ğ—§‚Ä‚éj
+							// ä»–ã®ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®å‹ã¡
+							// ï¼ˆãã®æ‰‹ã¯æŒ‡ã›ãªã„ã€ã¨ã„ã†ãƒ•ãƒ©ã‚°ã‚’ç«‹ã¦ã‚‹ï¼‰
 							won_by_other = true;
 							return false;
 						}
-						// ’TõŒp‘±
+						// æ¢ç´¢ç¶™ç¶š
 						next_candidates.emplace_back(b_tmp, cand->choice);
 						return true;
 					});
@@ -130,14 +130,14 @@ public:
 				next_candidates.clear();
 			}
 			
-			// ‚±‚Ì“_‚ÅŒˆ’…‚ª•t‚©‚È‚¢ê‡A‚Ü‚¾æ“Ç‚İ‚Å‚«‚éè”‚ªc‚Á‚Ä‚¢‚é‚È‚ç‚Î
-			// æ“Ç‚İ‚·‚éB
+			// ã“ã®æ™‚ç‚¹ã§æ±ºç€ãŒä»˜ã‹ãªã„å ´åˆã€ã¾ã å…ˆèª­ã¿ã§ãã‚‹æ‰‹æ•°ãŒæ®‹ã£ã¦ã„ã‚‹ãªã‚‰ã°
+			// å…ˆèª­ã¿ã™ã‚‹ã€‚
 			if(!won_by_other){
 				if(remained_depth > 1){
-					// ‚Ü‚¾[‚­’Tõ‚µ‚Ä‚à‚æ‚¢‚Ì‚Å‚ ‚ê‚Î
-					// ‚Ü‚¾c‚Á‚Ä‚¢‚éŠe‰Â”\«‚É‚Â‚¢‚ÄŒŸ“¢‚·‚éB
-					// ‚±‚ê‚ÍA‘Šè‚Ìè‚»‚ê‚¼‚ê‚É‚Â‚¢‚Äƒ‹[ƒv‚·‚é‚à‚Ì‚È‚Ì‚ÅA
-					// ƒXƒRƒA‚ÍÅˆ«‚ÌƒP[ƒX‚Å•]‰¿‚µ‚È‚¢‚Æ‚È‚ç‚È‚¢B
+					// ã¾ã æ·±ãæ¢ç´¢ã—ã¦ã‚‚ã‚ˆã„ã®ã§ã‚ã‚Œã°
+					// ã¾ã æ®‹ã£ã¦ã„ã‚‹å„å¯èƒ½æ€§ã«ã¤ã„ã¦æ¤œè¨ã™ã‚‹ã€‚
+					// ã“ã‚Œã¯ã€ç›¸æ‰‹ã®æ‰‹ãã‚Œãã‚Œã«ã¤ã„ã¦ãƒ«ãƒ¼ãƒ—ã™ã‚‹ã‚‚ã®ãªã®ã§ã€
+					// ã‚¹ã‚³ã‚¢ã¯æœ€æ‚ªã®ã‚±ãƒ¼ã‚¹ã§è©•ä¾¡ã—ãªã„ã¨ãªã‚‰ãªã„ã€‚
 					int opponents_best_score = SIMULATED_MOVES;
 					for(auto cand = current_candidates.begin(); cand != current_candidates.end(); ++cand){
 						AIresult res = think(cand->board, this_player, remained_depth-1);
@@ -148,18 +148,18 @@ public:
 					
 					position2score.emplace_back(opponents_best_score, i, j);
 				}else{
-					// ‚à‚¤‚±‚êˆÈã‚Ìæ“Ç‚İ‚ª‚Å‚«‚È‚¢ê‡iŸ”s‚Í•s–¾j
+					// ã‚‚ã†ã“ã‚Œä»¥ä¸Šã®å…ˆèª­ã¿ãŒã§ããªã„å ´åˆï¼ˆå‹æ•—ã¯ä¸æ˜ï¼‰
 					position2score.emplace_back(0, i, j);
 				}
 			}else{
-				// ‘Šè‚ÌŸ‚¿‚ªŠm’è
+				// ç›¸æ‰‹ã®å‹ã¡ãŒç¢ºå®š
 				position2score.emplace_back(-remained_depth, i, j);
 			}
-		}} // uˆêè–Úvƒ‹[ƒv‚ÌI‚í‚è
+		}} // ã€Œä¸€æ‰‹ç›®ã€ãƒ«ãƒ¼ãƒ—ã®çµ‚ã‚ã‚Š
 		
-		// Œó•â‚Æ‚µ‚Äc‚Á‚½‚à‚Ì‚Ì‚¤‚¿AÅ‘P‚Ì‚à‚Ì‚ğ•Ô‚·
+		// å€™è£œã¨ã—ã¦æ®‹ã£ãŸã‚‚ã®ã®ã†ã¡ã€æœ€å–„ã®ã‚‚ã®ã‚’è¿”ã™
 		if(position2score.empty()){
-			// Œó•â‚ª‚à‚¤‚È‚¢i”Õ–Ê‚ª–„‚Ü‚Á‚Ä‚¢‚éj‚È‚ç‚Î
+			// å€™è£œãŒã‚‚ã†ãªã„ï¼ˆï¼ç›¤é¢ãŒåŸ‹ã¾ã£ã¦ã„ã‚‹ï¼‰ãªã‚‰ã°
 #ifdef KAKUTEI_MORE_DEBUG
 			if(remained_depth == SIMULATED_MOVES){
 				std::cerr << "No place remained!" << std::endl;
@@ -169,12 +169,12 @@ public:
 		}
 		
 		int best_score = -(static_cast<int>(SIMULATED_MOVES)+1);
-		double count_for_current_score = 0.0; // ¡‚ÌƒXƒRƒA‚Ìè‚ª‚¢‚­‚Â‚ ‚é‚©
+		double count_for_current_score = 0.0; // ä»Šã®ã‚¹ã‚³ã‚¢ã®æ‰‹ãŒã„ãã¤ã‚ã‚‹ã‹
 		AIresult chosen;
 		
 		for(auto it = position2score.begin(); it != position2score.end(); ++it){
 			if(it->winner < best_score){
-				// ‚±‚Ìè‚ªA‚·‚Å‚É‘I‚Î‚ê‚Ä‚¢‚éè‚æ‚è‚àˆ«‚¢ê‡
+				// ã“ã®æ‰‹ãŒã€ã™ã§ã«é¸ã°ã‚Œã¦ã„ã‚‹æ‰‹ã‚ˆã‚Šã‚‚æ‚ªã„å ´åˆ
 				continue;
 			}
 			
@@ -199,7 +199,7 @@ public:
 		return chosen;
 	}
 	
-	// AI‚Ì“à—e
+	// AIã®å†…å®¹
 	std::tuple<int, int> ai(const Board& board, int player) {
 		AIresult th = think(board, player, SIMULATED_MOVES);
 		return th.position;

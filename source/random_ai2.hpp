@@ -1,4 +1,4 @@
-#include "4moku.hpp"
+﻿#include "4moku.hpp"
 
 /*
  ランダムに数手置いてみて、一番勝てそうなものを採用する。

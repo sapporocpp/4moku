@@ -1,4 +1,5 @@
 4moku
 build
 .sconsign.dblite
-
+*.sdf
+*.vcxproj.user

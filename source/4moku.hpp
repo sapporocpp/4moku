@@ -16,12 +16,12 @@ const int WIN=1;
 const int FAILED=2;
 
 struct Board {
-	// ‹ó‚Ì”Õ–Ê‚ğ¶¬
+	/* ç©ºã®ç›¤é¢ã‚’ç”Ÿæˆ */
 	Board(const int xnum, const int ynum, const int num_players) : 
 		xnum(xnum),ynum(ynum),data(xnum*ynum),num_players(num_players)
 	{ }
 	
-	// ‘¼‚Ì”Õ–Ê‚ğƒRƒs[
+	/* ä»–ã®ç›¤é¢ã‚’ã‚³ãƒ”ãƒ¼ */
 	Board(const Board& other) : 
 		xnum(other.xnum),ynum(other.ynum),data(other.data),num_players(other.num_players) 
 	{ }
@@ -37,12 +37,12 @@ private:
 	const int num_players;
 };
 
-void disp(const Board& board); // •\¦‚·‚é
-int player_id(int player); // ƒvƒŒƒCƒ„[”Ô†
-bool placeable(const Board& board, int x, int y); // ‚»‚ÌêŠ‚É’u‚¯‚é‚©”»’è
-int finished(const Board& board); // Œˆ’…‚ª‚Â‚¢‚½‚©”»’è
+void disp(const Board& board); /* è¡¨ç¤ºã™ã‚‹ */
+int player_id(int player); /* ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ç•ªå· */
+bool placeable(const Board& board, int x, int y); /* ãã®å ´æ‰€ã«ç½®ã‘ã‚‹ã‹åˆ¤å®š */
+int finished(const Board& board); /* æ±ºç€ãŒã¤ã„ãŸã‹åˆ¤å®š */
 int update(Board& board,const int player,
 			std::function<std::tuple<int,int>(const Board&,int)> ai_function);
-			// AI‚ğ•\‚·ŠÖ”ai_function‚ğÀs‚µA‚»‚±‚ÉÎ‚ğ’u‚­
+			/* AIã‚’è¡¨ã™é–¢æ•°ai_functionã‚’å®Ÿè¡Œã—ã€ãã“ã«çŸ³ã‚’ç½®ã */
 
 #endif // HPP_4MOKU

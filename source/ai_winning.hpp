@@ -2,8 +2,8 @@
 #include <ctime>
 
 std::tuple<int,int> ai_winning(const Board& board,int player) {
-    // ©•ª‚ªŸ‚Â‚±‚Æ‚ªŠm’è‚·‚é‚æ‚¤‚È’u‚«êŠ‚ª‚ ‚é‚È‚ç‚»‚±‚É’u‚­B
-    // ‚»‚¤‚Å‚È‚¯‚ê‚Îƒ‰ƒ“ƒ_ƒ€‚É’u‚­B
+    /* è‡ªåˆ†ãŒå‹ã¤ã“ã¨ãŒç¢ºå®šã™ã‚‹ã‚ˆã†ãªç½®ãå ´æ‰€ãŒã‚ã‚‹ãªã‚‰ãã“ã«ç½®ãã€‚ */
+    /* ãã†ã§ãªã‘ã‚Œã°ãƒ©ãƒ³ãƒ€ãƒ ã«ç½®ãã€‚ */
     
 	int nx,ny;
 	std::tie(nx,ny) = board.size();
@@ -17,15 +17,15 @@ std::tuple<int,int> ai_winning(const Board& board,int player) {
 	for(int i=0;i<300;++i) {
 		int x=rndx(mt), y=rndy(mt);
 		if(placeable(board, x, y)){
-			// ’u‚¯‚é‚È‚ç
+			/* ç½®ã‘ã‚‹ãªã‚‰ */
 			Board board_tmp(board);
 			board_tmp(x,y) = player_id(player);
 			
 			if(finished(board_tmp)){
-				// ‚»‚±‚É’u‚¢‚ÄŸ‚Â‚È‚ç
+				/* ãã“ã«ç½®ã„ã¦å‹ã¤ãªã‚‰ */
 				return std::make_tuple(x,y);
 			}else{
-				// ‚»‚¤‚Å‚È‚¢‚È‚ç
+				/* ãã†ã§ãªã„ãªã‚‰ */
 				if(std::get<0>(random_choice) == -1){
 					random_choice = std::make_tuple(x,y);
 				}

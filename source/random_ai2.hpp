@@ -5,7 +5,7 @@
  */
 
 
-// ランダムに置くAI
+/* ランダムに置くAI */
 std::tuple<int,int> random_ai(const Board& board,int /*player*/) {
 	int nx,ny;
 	std::tie(nx,ny) = board.size();
@@ -25,7 +25,7 @@ std::tuple<int,int> random_ai(const Board& board,int /*player*/) {
 }
 
 
-// おける場所を列挙する
+/* おける場所を列挙する */
 std::vector<std::tuple<int,int>> get_candidates(const Board& board) {
 	int nx,ny;
 	std::tie(nx,ny) = board.size();
@@ -42,30 +42,30 @@ std::vector<std::tuple<int,int>> get_candidates(const Board& board) {
 	return list;
 }
 
-// ランダムで最後まで試行し、勝ったかを調べる
+/* ランダムで最後まで試行し、勝ったかを調べる */
 template<typename Position>
 bool get_try_result(Board board, int self, Position next) {
-	// 自分の次の石を置く
+	/* 自分の次の石を置く */
 	const int x = std::get<0>(next);
 	const int y = std::get<1>(next);
 	board(x,y) = player_id(self);
 
-	// 勝ち決定したら即返す
+	/* 勝ち決定したら即返す */
 	if(finished(board)>0) {
 		return true;
 	}
 
-	// 次のプレイヤーからランダムに置かせる
+	/* 次のプレイヤーからランダムに置かせる */
 	int player,state=0;
 	const int num = board.players();
 
-	// 終わるまでループ
+	/* 終わるまでループ */
 	for(int i=0;;++i) {
-		// 最初だけは、自分の次のプレイヤーから開始
+		/* 最初だけは、自分の次のプレイヤーから開始 */
 		const int p = i==0 ? self+1 : 0;
 
-		// 各プレイヤーのAI呼び出し
-		// 他AIはわからないのでランダムAIを利用
+		/* 各プレイヤーのAI呼び出し */
+		/* 他AIはわからないのでランダムAIを利用 */
 		for(player=p;player<num;++player) {
 			state = update(board, player, random_ai);
 			if(state!=0) {
@@ -73,7 +73,7 @@ bool get_try_result(Board board, int self, Position next) {
 			}
 		}
 
-		// 勝敗を調べて勝っていたらtrueを返す
+		/* 勝敗を調べて勝っていたらtrueを返す */
 		if(state!=0) {
 			if(state==WIN && player==self)
 				return true;
@@ -84,13 +84,13 @@ bool get_try_result(Board board, int self, Position next) {
 }
 
 std::tuple<int,int> random_ai2(const Board& board,int player) {
-	// 次における場所の候補
+	/* 次における場所の候補 */
 	const auto candidates = get_candidates(board);
 	
-	// 候補１つに対する試行回数
+	/* 候補１つに対する試行回数 */
 	const int try_number = 100;
 
-	// 勝率リスト 
+	/* 勝率リスト  */
 	std::vector<double> p;
 	
 	for(auto pos: candidates) {

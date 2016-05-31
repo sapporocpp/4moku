@@ -15,7 +15,7 @@ struct ManualInput{
 		return std::make_tuple(x, y);
 	}
 	
-	// AI‚Ì“à—e
+	/* AIã®å†…å®¹ */
 	std::tuple<int, int> ai(const Board& board, int player) const{
 		std::string input;
 		std::tuple<int, int> result;

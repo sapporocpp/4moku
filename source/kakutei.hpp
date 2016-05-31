@@ -6,12 +6,14 @@ private:
 	std::uniform_real_distribution<double> rnd;
 	
 public:
-	// �R���X�g���N�^�ł́A���������ɕK�v�Ȃ��̂����������Ă���
+	/* コンストラクタでは、乱数生成に必要なものを初期化しておく */
 	Kakutei(int seed) : mt(seed + std::time(0)), rnd(0.0, 1.0) {}
 	
-	// �w���p�[�֐��F
-	// �Ֆʂ̂����u����ꏊ���ׂĂɂ��ČJ��Ԃ�
-	// false��Ԃ����ꍇ���̎��_�őł��؂�
+	/*
+	ヘルパー関数：
+	盤面のうち置ける場所すべてについて繰り返す
+	falseを返した場合その時点で打ち切る
+	*/
 	template <class FUNCTYPE>
 	void try_for_placeable(const Board & board, const FUNCTYPE & func){
 		bool break_loop = false;
@@ -31,11 +33,13 @@ public:
 		}
 	}
 	
-	// AI�̓��e
+	/* AIの内容 */
 	std::tuple<int, int> ai(const Board& board,int player) {
-		// �E�����������Ƃ��m�肷��悤�Ȓu���ꏊ������Ȃ炻���ɒu���B
-		// �E�������u�����ƂŁA���ɑ��肪�����Ƃ��m�肷��u���ꏊ������Ȃ炻���͒u���Ȃ��B
-		// �E�����łȂ���΁A�u����ꏊ�ɒu���B
+		/*
+		・自分が勝つことが確定するような置き場所があるならそこに置く。
+		・自分が置くことで、次に相手が勝つことが確定する置き場所があるならそこは置かない。
+		・そうでなければ、置ける場所に置く。
+		*/
 		
 		int nx,ny;
 		std::tie(nx,ny) = board.size();
@@ -51,13 +55,13 @@ public:
 		try_for_placeable(board, [&](const Board & b, int i, int j){
 			std::tuple<int,int> this_choice = std::make_tuple(i, j);
 			
-			// �����_���I���̏ꏊ�������I�΂�Ă��Ȃ��ꍇ�A�I��ł���
-			// �i�G���[�ɂȂ�Ȃ��悤�ɂ��邽�߁j
+			/* ランダム選択の場所が何も選ばれていない場合、選んでおく */
+			/* （エラーにならないようにするため） */
 			if(std::get<0>(random_choice) == -1){
 				random_choice = this_choice;
 			}
 			
-			// �����ɒu�����ƂŎ����̏������m��ł���Ȃ�u��
+			/* そこに置くことで自分の勝ちが確定できるなら置く */
 			Board b_tmp(b);
 			b_tmp(i, j) = player_id(player);
 			if(finished(b_tmp) == player_id(player)){
@@ -65,8 +69,8 @@ public:
 				return false;
 			}
 			
-			// �����ɒu�����ƂŁA���ɑ��肪�u���ď��Ă�ꏊ������Ȃ炻���ɒu���Ȃ�
-			// ���肪�u���ꏊ�̌���(p, q)�Ƃ��A���ׂĂ̒u���ꏊ�ɂ��Ď����Ă���B
+			/* そこに置くことで、次に相手が置いて勝てる場所があるならそこに置かない */
+			/* 相手が置く場所の候補を(p, q)とし、すべての置き場所について試している。 */
 			bool lost = false;
 			try_for_placeable(b_tmp, [&](const Board & b_t, int p, int q){
 				Board b_t2(b_t);
@@ -79,15 +83,17 @@ public:
 				return true;
 			});
 			
-			// �����ɒu���ĕ������m�肵�Ȃ��ꍇ�A�����_���I���̌��ɉ�����B
-			// 
-			// �������A�u����ꏊ�����ӏ����邩�͍ŏ�����͂킩��Ȃ��̂ŁA
-			// �ȉ��̕��@�őI������B
-			// �E1�ڂɌ��������u����ꏊ�ɂ��ẮA�m��1�őI�ԁB
-			// �E2�ڂɌ��������u����ꏊ�ɂ��ẮA�m��1/2�őI�ԁB
-			// �E3�ڂɌ��������u����ꏊ�ɂ��ẮA�m��1/3�őI�ԁB
-			//   :
-			// �����߂̒u����ꏊ�ł��邩�́Acandidates�ɕێ����Ă���B
+			/*
+			そこに置いて負けが確定しない場合、ランダム選択の候補に加える。
+			
+			ただし、置ける場所が何箇所あるかは最初からはわからないので、
+			以下の方法で選択する。
+			・1つ目に見つかった置ける場所については、確率1で選ぶ。
+			・2つ目に見つかった置ける場所については、確率1/2で選ぶ。
+			・3つ目に見つかった置ける場所については、確率1/3で選ぶ。
+			  :
+			いくつめの置ける場所であるかは、candidatesに保持している。
+			*/
 			if(!lost){
 				++candidates;
 				

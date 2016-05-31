@@ -1,11 +1,12 @@
 ﻿#include "4moku.hpp"
 #include<cstdlib>
 
-// ここに使うAIを定義する
+/* ここに使うAIを定義する */
 #include "test_ai.hpp"
 #include "random_ai2.hpp"
 #include "ai_winning.hpp"
-#include "kakutei.hpp"
+#include "kakutei-more.hpp"
+#include "manual_input.hpp"
 
 int Board::operator()(int x, int y) const {
 	return data[x + y*xnum];
@@ -30,7 +31,7 @@ void disp(const Board& board) {
 
 	std::tie(nx,ny) = board.size();
 	for(int j=ny-1;j>=0;--j) {
-		// 何も置かれてない行は表示させない
+		/* 何も置かれてない行は表示させない */
 		bool empty_line = true;
 		for(int i=0;i<nx;++i)
 			empty_line &= board(i,j)==0;
@@ -54,16 +55,16 @@ bool placeable(const Board& board, int x, int y) {
 	int nx,ny;
 	std::tie(nx,ny) = board.size();
 
-	// board範囲外はおけない
+	/* board範囲外はおけない */
 	if(x<0 || y<0 || nx<=x || ny<=y)
 		return false;
 
-	// すでに置かれているところには置けない
+	/* すでに置かれているところには置けない */
 	if(board(x,y)!=0)
 		return false;
 
-	// 下はpieceまたは壁でなければならない
-	// (2段目以上なら下にpieceがなければならない)
+	/* 下はpieceまたは壁でなければならない */
+	/* (2段目以上なら下にpieceがなければならない) */
 	if(y>0 && board(x,y-1)==0)
 		return false;
 	
@@ -89,19 +90,19 @@ int finished(const Board& board) {
 
 	for(int i=0;i<nx;++i) {
 		for(int j=0;j<ny;++j) {
-			// 右方向
+			/* 右方向 */
 			const auto right = f(i,j,1,0);
 			if(right>0) return right;
 
-			// 下方向
+			/* 下方向 */
 			const auto down = f(i,j,0,-1);
 			if(down>0) return down;
 
-			// 右下方向
+			/* 右下方向 */
 			const auto rightdown = f(i,j,1,-1);
 			if(rightdown>0) return rightdown;
 
-			// 右上方向
+			/* 右上方向 */
 			const auto rightup= f(i,j,1,1);
 			if(rightup>0) return rightup;
 		}
@@ -120,50 +121,51 @@ int update(Board& board,const int player,
 		board(x,y) = player_id(player);
 	}
 	else {
-		// this player failed
+		/* this player failed */
 		return FAILED;
 	}
 
 	if(finished(board)>0) {
-		// win
+		/* win */
 		return WIN;
 	}
 	
 	return 0;
 }
 
-// メイン
+/* メイン */
 int main() {
 	using FuncType = std::tuple<int,int>(const Board&,int);
 	using std::placeholders::_1;
 	using std::placeholders::_2;
 
-	// クラスで実装した場合はここでインスタンス化
-	auto ai0 = TestAI();
-	auto ai1 = TestAI();
-	auto kakutei_ai1 = Kakutei(3290431);
-	auto kakutei_ai2 = Kakutei(6490645);
+	/* クラスで実装した場合はここでインスタンス化 */
+	//auto ai0 = TestAI();
+	//auto ai1 = TestAI();
+	auto manual_input = ManualInput();
+	auto kakutei_ai1 = KakuteiMore<3>(3290431);
+	//auto kakutei_ai2 = KakuteiMore<3>(6490645);
 
-	// 使うAIを登録
+	/* 使うAIを登録 */
 	std::vector<std::function<FuncType>> ai_list {
-		/*
-		[&](const Board& board, int player){ // ラムダ式で登録
+#if 0
+		[&](const Board& board, int player){ /* ラムダ式で登録 */
 			return ai0(board, player);
 		},
-		std::bind(&TestAI::operator(), ai1, _1, _2), // std::bindで登録
-		ai_winning, // 関数ポインタで登録
+		std::bind(&TestAI::operator(), ai1, _1, _2), /* std::bindで登録 */
+		ai_winning, /* 関数ポインタで登録 */
 		random_ai2,
-		*/
-			[&](const Board& board, int player){ return kakutei_ai1.ai(board, player); },
-			[&](const Board& board, int player){ return kakutei_ai2.ai(board, player); }
+#endif
+			[&](const Board& board, int player){ return manual_input.ai(board, player); },
+			[&](const Board& board, int player){ return kakutei_ai1.ai(board, player); }
 		//std::bind(&TestAI::operator(), ai1, _1, _2)
 	};
 
 	const int num_players = ai_list.size();
-	const auto xnum = 10, ynum=5;
+	const auto xnum = 7, ynum=5;
 	Board board = {xnum, ynum, num_players};
 	
-	// メインループをラムダ式で定義
+	/* メインループをラムダ式で定義 */
 	auto main_loop = [&]() {
 		while(true){
 			for(auto player=0;player<num_players;++player) {
@@ -176,7 +178,7 @@ int main() {
 		}
 	};
 	int last_player, last_state;
-	std::tie(last_player, last_state) = main_loop(); // メインループを実行してるのはここ
+	std::tie(last_player, last_state) = main_loop(); /* メインループを実行してるのはここ */
 
 	std::cout << "-------------------------" << std::endl;
 	if(last_state==WIN)

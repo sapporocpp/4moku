@@ -1,4 +1,4 @@
-#include "4moku.hpp"
+﻿#include "4moku.hpp"
 
 void Board::reset(const int n_x, const int n_y, const int n_players) {
 	xnum = n_x;

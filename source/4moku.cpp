@@ -9,6 +9,9 @@ void Board::reset(const int n_x, const int n_y, const int n_players) {
 }
 
 int Board::operator()(int x, int y) const {
+	if (x < 0 || x >= static_cast<int>(xnum) || y < 0 || y >= static_cast<int>(ynum)) {
+		return -1;
+	}
 	return data[x + y*xnum];
 }
 

@@ -12,25 +12,66 @@
 // 補助関数
 //--------------------------------------------------------------
 
-// マウスの座標をグリッドの座標として取得
-void OF4mokuWindow::mousepos2gridcoord(int mouse_x, int mouse_y) {
-	x_window_pos_ = mouse_x / gridsize_;
-	y_window_pos_ = mouse_y / gridsize_;
+int OF4mokuWindow::mouse_gridX_board() const {
+	return mouse_gridX_;
 }
 
+int OF4mokuWindow::mouse_gridY_board() const {
+	return board.size_y() - mouse_gridY_ - 1;
+}
+
+// マウスの座標をグリッドの番号に変換
+void OF4mokuWindow::mousepos2gridcoord(int mouse_x, int mouse_y) {
+	mouse_gridX_ = mouse_x / gridsize_;
+	mouse_gridY_ = mouse_y / gridsize_;
+}
+
+// アプリの状態を変更
+void OF4mokuWindow::update_app_status(AppStatus new_status) {
+	app_status = new_status;
+	windowResized(ofGetWidth(), ofGetHeight());
+}
+
+// AIの手を進める。
+// AIではないプレイヤーの番が来たか、ゲームが決着した時点で止める。
+// 止めた後は描画も行う。
+void OF4mokuWindow::progress_game() {
+	for (;;) {
+		if (game_winner) break;
+
+		if (player_ai_ids[next_player] < 0) {
+			// AIではないプレイヤーの場合
+			break;
+		} else {
+			// AIの場合
+			int x, y;
+			std::tie(x, y) = (ai_list[player_ai_ids[next_player]])(board, next_player);
+
+			last_move_x = x;
+			last_move_y = y;
+			board(x, y) = player_id(next_player);
+			++next_player;
+			if (next_player >= board.players()) next_player = 0;
+			game_winner = finished(board);
+		}
+	}
+	draw();
+}
 
 //--------------------------------------------------------------
 // コンストラクタ
 //--------------------------------------------------------------
 OF4mokuWindow::OF4mokuWindow()
-	: x_window_pos_(-1), y_window_pos_(-1), gridsize_(0), next_player(0),
-	board(10, 5, 2), app_status(AppStatus::Title), player_ai_ids(2, -1) {
+	: mouse_gridX_(-1), mouse_gridY_(-1), gridsize_(0), next_player(0),
+	board(10, 5, NUM_PLAYERS), game_winner(0), player_ai_ids(NUM_PLAYERS, -1) {
 	
+	update_app_status(AppStatus::Title);
+
 	// 対局AIを準備
 	using FuncType = std::tuple<int, int>(const Board&, int);
 
 	TestAI test_ai;
-	KakuteiMore<3> kakutei_more;
+	KakuteiMore<2> kakutei_more;
 
 	ai_list = {
 		[&](const Board& board, int player) { return test_ai(board, player); },
@@ -42,7 +83,7 @@ OF4mokuWindow::OF4mokuWindow()
 const std::vector<const char *> OF4mokuWindow::ai_names = {
 	"AI-Random",
 	"AI-Neighbors (by ignis)",
-	"AI-FixedSimulation (by H.Hiro)",
+	"AI-FixedTurnSimulation (by H.Hiro)",
 	"AI-RandomSimulation (by ignis)"
 };
 
@@ -54,20 +95,28 @@ void OF4mokuWindow::setup() {
 }
 
 //--------------------------------------------------------------
+// ウィンドウサイズが変更されたときの処理
+//--------------------------------------------------------------
+void OF4mokuWindow::windowResized(int w, int h) {
+	switch (app_status) {
+	case AppStatus::Title:
+		gridsize_ = h / (board.players() + ROWS_TITLEINFO);
+		break;
+	case AppStatus::Game:
+		gridsize_ = std::min(
+			w / board.size_x(),
+			h / (board.size_y() + board.players() + ROWS_GAMEINFO)
+		);
+		break;
+	default:
+		break;
+	}
+}
+
+//--------------------------------------------------------------
 // 画面描画前の処理
 //--------------------------------------------------------------
 void OF4mokuWindow::update(){
-	float window_width = static_cast<float>(ofGetWidth());
-	float window_height = static_cast<float>(ofGetHeight());
-
-	int new_gridsize = std::min(
-		window_width / board.size_x(),
-		window_height / (board.size_y() + board.players() + 1)
-	);
-
-	if (new_gridsize != gridsize_) {
-		gridsize_ = new_gridsize;
-	}
 }
 
 //--------------------------------------------------------------
@@ -76,8 +125,8 @@ void OF4mokuWindow::update(){
 
 void OF4mokuWindow::draw_for_title() {
 	ofFill();
-	for (int y = 0; y < 4; ++y) {
-		if (y == y_window_pos_) {
+	for (int y = 0; y < NUM_PLAYERS + 2; ++y) {
+		if (y > 0 && y == mouse_gridY_) {
 			ofSetColor(192, 255, 192);
 		} else {
 			ofSetColor(224, 224, 224);
@@ -86,11 +135,15 @@ void OF4mokuWindow::draw_for_title() {
 	}
 	ofSetColor(0, 0, 0);
 	ofDrawBitmapString("4moku", 0, gridsize_);
-	ofDrawBitmapString("Player 1:", 0, 2 * gridsize_);
-	ofDrawBitmapString((player_ai_ids[0] == -1 ? "Manual" : ai_names[player_ai_ids[0]]), 3 * gridsize_, 2 * gridsize_);
-	ofDrawBitmapString("Player 2:", 0, 3 * gridsize_);
-	ofDrawBitmapString((player_ai_ids[1] == -1 ? "Manual" : ai_names[player_ai_ids[1]]), 3 * gridsize_, 3 * gridsize_);
-	ofDrawBitmapString("Start", 0, 4 * gridsize_);
+
+	std::stringstream buf;
+
+	for (int i = 0; i < NUM_PLAYERS; ++i) {
+		buf.str("");
+		buf << "Player " << (i+1) << ": " << (player_ai_ids[i] == -1 ? "Manual" : ai_names[player_ai_ids[i]]);
+		ofDrawBitmapString(buf.str(), 0, (i + 2) * gridsize_);
+	}
+	ofDrawBitmapString("Start Game", 0, (NUM_PLAYERS + 2) * gridsize_);
 }
 
 //--------------------------------------------------------------
@@ -101,6 +154,7 @@ void OF4mokuWindow::draw_for_title() {
 void OF4mokuWindow::draw_grid(int x, int y, bool has_cursor, bool is_placeable) {
 	float grid_corner_x = x * gridsize_;
 	float grid_corner_y = (board.size_y() - 1 - y) * gridsize_;
+	ofSetLineWidth(1);
 
 	ofColor bgcolor;
 	if (has_cursor) {
@@ -130,6 +184,7 @@ void OF4mokuWindow::draw_stone(int x, int y, int player) {
 	float stone_size = gridsize_ * 0.96;
 	float stone_center_x = x * gridsize_ + gridsize_ * 0.5;
 	float stone_center_y = (board.size_y() - 1 - y) * gridsize_ + gridsize_ * 0.5;
+	ofSetLineWidth(1);
 
 	if (player == 1) {
 		ofSetColor(0, 0, 0);
@@ -147,15 +202,64 @@ void OF4mokuWindow::draw_stone(int x, int y, int player) {
 
 // 全体
 void OF4mokuWindow::draw_for_game() {
+	int y_board_pos = board.size_y() - 1 - mouse_gridY_;
+
+	// 盤面
 	for (int x = 0; x < board.size_x(); ++x) {
 		for (int y = 0; y < board.size_y(); ++y) {
-			int y_board_pos = board.size_y() - 1 - y_window_pos_;
-
-			draw_grid(x, y, (x == x_window_pos_ && y == y_board_pos), placeable(board, x, y));
+			// マスを描画
+			draw_grid(x, y, (game_winner == 0 && x == mouse_gridX_ && y == y_board_pos), placeable(board, x, y));
 
 			// 石を描画
 			draw_stone(x, y, board(x, y));
 		}
+	}
+	if (last_move_x >= 0 && last_move_y >= 0) {
+		// 最後に指された手
+		ofSetColor(255, 0, 0);
+		ofNoFill();
+		ofSetLineWidth(3);
+		ofDrawRectangle(last_move_x * gridsize_, (board.size_y() - 1 - last_move_y) * gridsize_, gridsize_, gridsize_);
+	}
+
+	// 対局状況
+	std::stringstream buf;
+
+	// 次に指すプレイヤー、決着など
+	if (game_winner && mouse_gridY_ == board.size_y()) {
+		ofSetColor(192, 255, 192);
+	}
+	else {
+		ofSetColor(255, 255, 255);
+	}
+	ofFill();
+	ofDrawRectangle(0, board.size_y() * gridsize_, static_cast<float>(ofGetWidth()), gridsize_);
+	if (game_winner) {
+		buf.str("");
+		buf << "Player " << game_winner << " won the game! Click to show title";
+	} else {
+		buf.str("");
+		buf << "Turn for Player " << player_id(next_player) << ".";
+		draw_stone(board.size_x() - 1, -1, player_id(next_player));
+	}
+	ofSetColor(0, 0, 0);
+	ofDrawBitmapString(buf.str(), 0, (board.size_y() + 1) * gridsize_);
+	
+	// 各プレイヤーが何のAIであるか
+	for (int i = 0; i < NUM_PLAYERS; ++i) {
+		buf.str("");
+		buf << "Player" << player_id(i) << ": ";
+		if (player_ai_ids[i] >= 0) {
+			buf << ai_names[player_ai_ids[i]];
+		}
+		else {
+			buf << "Manual";
+		}
+		ofSetColor(255, 255, 255);
+		ofFill();
+		ofDrawRectangle(0, (board.size_y() + i + 1) * gridsize_, static_cast<float>(ofGetWidth()), gridsize_);
+		ofSetColor(0, 0, 0);
+		ofDrawBitmapString(buf.str(), 0, (board.size_y() + i + 2) * gridsize_);
 	}
 }
 
@@ -177,40 +281,62 @@ void OF4mokuWindow::draw(){
 // タイトル画面のマウスクリック
 //--------------------------------------------------------------
 void OF4mokuWindow::click_for_title(int button) {
-	if (button == OF_MOUSE_BUTTON_LEFT) {
-		switch (y_window_pos_) {
-		case 1: case 2:
-			{
-				int player_id = y_window_pos_ - 1;
-				++player_ai_ids[player_id];
-				if (player_ai_ids[player_id] >= ai_list.size()) player_ai_ids[player_id] = -1;
-			}
+	if (mouse_gridY_ >= 1 && mouse_gridY_ <= NUM_PLAYERS) {
+		int player = mouse_gridY_ - 1;
+
+		switch (button) {
+		case OF_MOUSE_BUTTON_LEFT:
+			++player_ai_ids[player];
+			if (player_ai_ids[player] >= ai_list.size()) player_ai_ids[player] = -1;
 			break;
-		case 3:
+		case OF_MOUSE_BUTTON_RIGHT:
+			--player_ai_ids[player];
+			if (player_ai_ids[player] < -1) player_ai_ids[player] = ai_list.size() -1;
+			break;
+		}
+	} else if (mouse_gridY_ == NUM_PLAYERS + 1) {
+		if (button == OF_MOUSE_BUTTON_LEFT) {
 			// ゲーム開始
 			next_player = 0;
+			game_winner = 0;
 			board.reset(10, 5, 2);
+			last_move_x = -1;
+			last_move_y = -1;
 
-			app_status = AppStatus::Game;
-			break;
-		default:
-			return;
+			update_app_status(AppStatus::Game);
+			progress_game();
 		}
-		draw();
 	}
+	draw();
 }
 
 //--------------------------------------------------------------
-// ゲーム中ののマウスクリック
+// ゲーム中のマウスクリック
 //--------------------------------------------------------------
 void OF4mokuWindow::click_for_game(int button) {
-	if (button == OF_MOUSE_BUTTON_LEFT) {
-		int y_board_pos = board.size_y() - 1 - y_window_pos_;
-		if (placeable(board, x_window_pos_, y_board_pos)) {
-			board(x_window_pos_, y_board_pos) = player_id(next_player);
-			++next_player;
-			if (next_player >= board.players()) next_player = 0;
+	if (game_winner) {
+		// 決着が着いた後
+		if (button == OF_MOUSE_BUTTON_LEFT && mouse_gridY_ == board.size_y()) {
+			update_app_status(AppStatus::Title);
 			draw();
+		}
+	}else {
+		// ゲーム進行中
+		if (button == OF_MOUSE_BUTTON_LEFT) {
+			if (placeable(board, mouse_gridX_board(), mouse_gridY_board())) {
+				// 石を置く
+				last_move_x = mouse_gridX_board();
+				last_move_y = mouse_gridY_board();
+
+				// TODO: 以下の部分はprogress_gameと同じ処理なのでリファクタリングする
+				board(mouse_gridX_board(), mouse_gridY_board()) = player_id(next_player);
+				++next_player;
+				if (next_player >= board.players()) next_player = 0;
+				game_winner = finished(board);
+
+				progress_game();
+				draw();
+			}
 		}
 	}
 }
@@ -256,6 +382,5 @@ void OF4mokuWindow::mouseExited(int x, int y) {
 //--------------------------------------------------------------
 void OF4mokuWindow::keyPressed(int key){}
 void OF4mokuWindow::keyReleased(int key){}
-void OF4mokuWindow::windowResized(int w, int h){}
 void OF4mokuWindow::gotMessage(ofMessage msg){}
 void OF4mokuWindow::dragEvent(ofDragInfo dragInfo){}

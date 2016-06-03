@@ -7,7 +7,7 @@ std::tuple<int,int> AI_Neighbors(const Board& board,int player) {
     std::uniform_int_distribution<> rndx(0,nx);
     std::uniform_int_distribution<> rndy(0,ny);
 
-    for(int x=0;x<nx;++x) {
+	for(int x=0;x<nx;++x) {
         for(int y=0;y<ny;++y) {
             /* 2つ連続する自分の石を探す */
             if(player_id(player)==board(x,y)
@@ -49,7 +49,7 @@ std::tuple<int,int> AI_Neighbors(const Board& board,int player) {
         }
     }
 
-    for(int x=0;x<nx;++x) {
+	for(int x=0;x<nx;++x) {
         for(int y=0;y<ny;++y) {
             /* 自分の石を探す */
             if(player_id(player)==board(x,y)) {
@@ -67,7 +67,7 @@ std::tuple<int,int> AI_Neighbors(const Board& board,int player) {
 
     std::tuple<int,int> random_choice = std::make_tuple(-1,-1);
 
-    for(int i=0;i<300;++i) {
+	for(int i=0;i<300;++i) {
         int x=rndx(mt), y=rndy(mt);
         if(placeable(board, x, y)){
             /* 置けるなら */

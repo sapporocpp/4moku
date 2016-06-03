@@ -1,5 +1,8 @@
 ﻿#include "4moku.hpp"
 #include <deque>
+#include <ctime>
+#include <cstdlib>
+#include <iostream>
 
 // #define KAKUTEI_MORE_DEBUG
 
@@ -12,8 +15,12 @@ private:
 	
 public:
 	// コンストラクタでは、乱数生成に必要なものを初期化しておく
-	KakuteiMore() : mt(std::time(0)), rnd(0.0, 1.0) {}
-	KakuteiMore(int seed) : mt(seed + std::time(0)), rnd(0.0, 1.0) {}
+	KakuteiMore() : mt(std::time(nullptr)), rnd(0.0, 1.0) {
+		std::srand(std::time(nullptr));
+	}
+	KakuteiMore(int seed) : mt(seed + std::time(nullptr)), rnd(0.0, 1.0) {
+		std::srand(std::time(nullptr));
+	}
 
 	// ヘルパー関数：
 	// 盤面のうち置ける場所すべてについて繰り返す
@@ -99,9 +106,10 @@ public:
 			for(int moves = 1; moves < board.players(); ++moves){
 				// 誰が手を選ぶか
 				const int simulated_player = (this_player + moves) % board.players();
+				std::deque<BoardCandidate>::iterator cand;
 				
 				// 現在可能性のあるすべての手について調べる
-				for(auto cand = current_candidates.begin(); cand != current_candidates.end(); ++cand){
+				for (cand = current_candidates.begin(); cand != current_candidates.end(); ++cand) {
 					try_for_placeable(cand->board, [&](const Board & b, int i1, int j1){
 						// そこに置くことで相手の勝ちが確定する？
 						Board b_tmp(b);
@@ -140,7 +148,8 @@ public:
 					// これは、相手の手それぞれについてループするものなので、
 					// スコアは最悪のケースで評価しないとならない。
 					int opponents_best_score = SIMULATED_MOVES;
-					for(auto cand = current_candidates.begin(); cand != current_candidates.end(); ++cand){
+					std::deque<BoardCandidate>::iterator cand;
+					for (cand = current_candidates.begin(); cand != current_candidates.end(); ++cand) {
 						AIresult res = think(cand->board, this_player, remained_depth-1);
 						if(res.winner < opponents_best_score){
 							opponents_best_score = res.winner;
@@ -154,7 +163,7 @@ public:
 				}
 			}else{
 				// 相手の勝ちが確定
-				position2score.emplace_back(-remained_depth, i, j);
+				position2score.emplace_back(-static_cast<int>(remained_depth), i, j);
 			}
 		}} // 「一手目」ループの終わり
 		
@@ -172,8 +181,9 @@ public:
 		int best_score = -(static_cast<int>(SIMULATED_MOVES)+1);
 		double count_for_current_score = 0.0; // 今のスコアの手がいくつあるか
 		AIresult chosen;
+		std::deque<AIresult>::iterator it;
 		
-		for(auto it = position2score.begin(); it != position2score.end(); ++it){
+		for(it = position2score.begin(); it != position2score.end(); ++it){
 			if(it->winner < best_score){
 				// この手が、すでに選ばれている手よりも悪い場合
 				continue;
@@ -186,8 +196,14 @@ public:
 				count_for_current_score += 1.0;
 			}
 			
+			/*
 			double r = rnd(mt);
 			if(r <= 1.0 / count_for_current_score){
+				chosen = *it;
+			}
+			*/
+			int r = std::rand();
+			if (r <= RAND_MAX / count_for_current_score) {
 				chosen = *it;
 			}
 		}

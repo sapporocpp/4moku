@@ -106,7 +106,7 @@ public:
 			for(int moves = 1; moves < board.players(); ++moves){
 				// 誰が手を選ぶか
 				const int simulated_player = (this_player + moves) % board.players();
-				std::deque<BoardCandidate>::iterator cand;
+				typename std::deque<BoardCandidate>::iterator cand;
 				
 				// 現在可能性のあるすべての手について調べる
 				for (cand = current_candidates.begin(); cand != current_candidates.end(); ++cand) {
@@ -148,7 +148,7 @@ public:
 					// これは、相手の手それぞれについてループするものなので、
 					// スコアは最悪のケースで評価しないとならない。
 					int opponents_best_score = SIMULATED_MOVES;
-					std::deque<BoardCandidate>::iterator cand;
+					typename std::deque<BoardCandidate>::iterator cand;
 					for (cand = current_candidates.begin(); cand != current_candidates.end(); ++cand) {
 						AIresult res = think(cand->board, this_player, remained_depth-1);
 						if(res.winner < opponents_best_score){
@@ -181,7 +181,7 @@ public:
 		int best_score = -(static_cast<int>(SIMULATED_MOVES)+1);
 		double count_for_current_score = 0.0; // 今のスコアの手がいくつあるか
 		AIresult chosen;
-		std::deque<AIresult>::iterator it;
+		typename std::deque<AIresult>::iterator it;
 		
 		for(it = position2score.begin(); it != position2score.end(); ++it){
 			if(it->winner < best_score){

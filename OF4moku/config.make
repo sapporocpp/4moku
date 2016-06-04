@@ -87,7 +87,7 @@ PROJECT_EXTERNAL_SOURCE_PATHS = ../source
 #
 #   Note: Leave a leading space when adding list items with the += operator
 ################################################################################
-PROJECT_DEFINES = OF4MOKU
+#PROJECT_DEFINES =
 
 ################################################################################
 # PROJECT CFLAGS

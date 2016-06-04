@@ -41,8 +41,8 @@ int main() {
 	// クラスで実装した場合はここでインスタンス化
 	auto ai0 = TestAI();
 	auto ai1 = TestAI();
-	auto kakutei_ai1 = Kakutei(3290431);
-	auto kakutei_ai2 = Kakutei(6490645);
+	auto kakutei_ai1 = KakuteiMore<3>(3290431);
+	auto kakutei_ai2 = KakuteiMore<3>(6490645);
 
 	// 使うAIを登録
 	std::vector<std::function<FuncType>> ai_list {
@@ -87,3 +87,4 @@ int main() {
 		std::cout << "Invalid" << std::endl;
 	return 0;
 }
+

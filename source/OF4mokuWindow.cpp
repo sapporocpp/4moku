@@ -76,7 +76,7 @@ OF4mokuWindow::OF4mokuWindow()
 	board(10, 5, NUM_PLAYERS), game_winner(0), player_ai_ids(NUM_PLAYERS, -1) {
 
 	// フォントのファイル名
-	font_path = ofFilePath::join(ofFilePath::getCurrentExeDir(), "VCR_OSD_MONO_1.001.ttf");
+	font_path = ofFilePath::join(ofFilePath::getCurrentExeDir(), "Inconsolata-Regular.ttf");
 
 	// アプリの状態
 	update_app_status(AppStatus::Title);

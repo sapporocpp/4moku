@@ -20,6 +20,9 @@ public:
 	// プレイヤー数
 	const int NUM_PLAYERS = 2;
 
+	// 1文字の高さを、最小でもウィンドウの幅の●分の1あるようにする
+	const int CHARS_PER_WINDOW_WIDTH = 40;
+
 private:
 	int mouse_gridX_; // マウスの位置を、グリッドの番号（一番左が0）で表したもの
 	int mouse_gridY_; // マウスの位置を、グリッドの番号（一番上が0）で表したもの
@@ -34,6 +37,8 @@ private:
 	Board board;
 	AppStatus app_status;
 	int game_winner;
+
+	std::string font_path;
 	ofTrueTypeFont font;
 
 	using FuncType = std::tuple<int, int>(const Board&, int);
@@ -53,8 +58,7 @@ private:
 	void click_for_game(int button); // ゲーム中のマウスクリック
 	void draw_grid(int x, int y, bool has_cursor, bool is_placeable);
 	void draw_stone(int x, int y, int player);
-	// void draw_for_main_menu(); // メインメニューにおける描画
-
+	void draw_str(const std::string & buf, int x, int y);
 
 public:
 	OF4mokuWindow();

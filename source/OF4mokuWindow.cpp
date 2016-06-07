@@ -1,4 +1,5 @@
 ﻿#include "OF4mokuWindow.h"
+#include <boost/filesystem.hpp>
 
 // ここに使うAIを定義する
 #include "test_ai.hpp"
@@ -58,13 +59,26 @@ void OF4mokuWindow::progress_game() {
 	draw();
 }
 
+// 文字列を描画
+void OF4mokuWindow::draw_str(const std::string & buf, int x, int y) {
+	if (font.isLoaded()) {
+		font.drawString(buf, x, y);
+	}else{
+		ofDrawBitmapString(buf, x, y);
+	}
+}
+
 //--------------------------------------------------------------
 // コンストラクタ
 //--------------------------------------------------------------
 OF4mokuWindow::OF4mokuWindow()
 	: mouse_gridX_(-1), mouse_gridY_(-1), gridsize_(0), next_player(0),
 	board(10, 5, NUM_PLAYERS), game_winner(0), player_ai_ids(NUM_PLAYERS, -1) {
-	
+
+	// フォントのファイル名
+	font_path = ofFilePath::join(ofFilePath::getCurrentExeDir(), "VCR_OSD_MONO_1.001.ttf");
+
+	// アプリの状態
 	update_app_status(AppStatus::Title);
 
 	// 対局AIを準備
@@ -98,12 +112,13 @@ void OF4mokuWindow::setup() {
 // ウィンドウサイズが変更されたときの処理
 //--------------------------------------------------------------
 void OF4mokuWindow::windowResized(int w, int h) {
+	float new_gridsize;
 	switch (app_status) {
 	case AppStatus::Title:
-		gridsize_ = h / (board.players() + ROWS_TITLEINFO);
+		new_gridsize = h / (board.players() + ROWS_TITLEINFO);
 		break;
 	case AppStatus::Game:
-		gridsize_ = std::min(
+		new_gridsize = std::min(
 			w / board.size_x(),
 			h / (board.size_y() + board.players() + ROWS_GAMEINFO)
 		);
@@ -111,6 +126,13 @@ void OF4mokuWindow::windowResized(int w, int h) {
 	default:
 		break;
 	}
+
+	if (gridsize_ != new_gridsize) {
+		// 画面サイズが変更された場合
+		gridsize_ = new_gridsize;
+		font.loadFont(font_path, std::min(static_cast<int>(gridsize_), w / CHARS_PER_WINDOW_WIDTH));
+	}
+	draw();
 }
 
 //--------------------------------------------------------------
@@ -134,16 +156,16 @@ void OF4mokuWindow::draw_for_title() {
 		ofDrawRectangle(0, y * gridsize_, static_cast<float>(ofGetWidth()), gridsize_);
 	}
 	ofSetColor(0, 0, 0);
-	ofDrawBitmapString("4moku", 0, gridsize_);
+	draw_str("4moku", 0, gridsize_);
 
 	std::stringstream buf;
 
 	for (int i = 0; i < NUM_PLAYERS; ++i) {
 		buf.str("");
 		buf << "Player " << (i+1) << ": " << (player_ai_ids[i] == -1 ? "Manual" : ai_names[player_ai_ids[i]]);
-		ofDrawBitmapString(buf.str(), 0, (i + 2) * gridsize_);
+		draw_str(buf.str(), 0, (i + 2) * gridsize_);
 	}
-	ofDrawBitmapString("Start Game", 0, (NUM_PLAYERS + 2) * gridsize_);
+	draw_str("Start Game", 0, (NUM_PLAYERS + 2) * gridsize_);
 }
 
 //--------------------------------------------------------------
@@ -243,7 +265,7 @@ void OF4mokuWindow::draw_for_game() {
 		draw_stone(board.size_x() - 1, -1, player_id(next_player));
 	}
 	ofSetColor(0, 0, 0);
-	ofDrawBitmapString(buf.str(), 0, (board.size_y() + 1) * gridsize_);
+	draw_str(buf.str(), 0, (board.size_y() + 1) * gridsize_);
 	
 	// 各プレイヤーが何のAIであるか
 	for (int i = 0; i < NUM_PLAYERS; ++i) {
@@ -259,7 +281,7 @@ void OF4mokuWindow::draw_for_game() {
 		ofFill();
 		ofDrawRectangle(0, (board.size_y() + i + 1) * gridsize_, static_cast<float>(ofGetWidth()), gridsize_);
 		ofSetColor(0, 0, 0);
-		ofDrawBitmapString(buf.str(), 0, (board.size_y() + i + 2) * gridsize_);
+		draw_str(buf.str(), 0, (board.size_y() + i + 2) * gridsize_);
 	}
 }
 

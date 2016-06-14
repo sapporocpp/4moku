@@ -1,4 +1,5 @@
 #include "AiList.hpp"
+#include "4moku.hpp"
 
 // ここに使うAIを定義する
 #include "test_ai.hpp"

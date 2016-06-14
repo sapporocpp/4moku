@@ -4,7 +4,7 @@
 #include<memory>
 #include<functional>
 
-class Board;
+struct Board;
 class AiLogic {
 public:
 	using Position = std::tuple<int,int>;

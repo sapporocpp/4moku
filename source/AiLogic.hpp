@@ -2,6 +2,7 @@
 #include<string>
 #include<vector>
 #include<memory>
+#include<functional>
 
 class Board;
 class AiLogic {

@@ -8,11 +8,13 @@
 #include "kakutei.hpp"
 #include "ignis-neighbors.hpp"
 #include "kakutei-more.hpp"
+#include "Manual.hpp"
 
 AiList::AiList() {
 	logics = {
 		std::make_shared<LogicWrapper>(AI_Neighbors, "Test AI"),
 		std::make_shared<LogicWrapper>(random_ai2,   "Random2"),
+		std::make_shared<Manual>(),
 	};
 }
 

@@ -14,6 +14,7 @@ struct Board;
 
 const int WIN=1;
 const int FAILED=2;
+const int PROGRESS=3;
 
 struct Board {
 	// 空の盤面を生成

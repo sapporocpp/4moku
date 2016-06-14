@@ -3,6 +3,7 @@
 #include<vector>
 #include<memory>
 #include<functional>
+#include"ofHeader.h"
 
 struct Board;
 class AiLogic {
@@ -12,6 +13,14 @@ public:
 	virtual Position next(const Board& board, int player) = 0;
 	virtual std::string name() const = 0;
 	virtual void draw() { };
+
+	virtual void mouseMoved   (ofMouseEventArgs& args){};
+	virtual void mouseDragged (ofMouseEventArgs& args){};
+	virtual void mousePressed (ofMouseEventArgs& args){};
+	virtual void mouseReleased(ofMouseEventArgs& args){};
+	virtual void mouseScrolled(ofMouseEventArgs& args){};
+	virtual void mouseEntered (ofMouseEventArgs& args){};
+	virtual void mouseExited  (ofMouseEventArgs& args){};
 };
 
 class LogicWrapper : public AiLogic {

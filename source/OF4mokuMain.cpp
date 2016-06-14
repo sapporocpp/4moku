@@ -1,5 +1,10 @@
-﻿#include "ofMain.h"
+﻿
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-variable"
+#pragma GCC diagnostic ignored "-Wconversion-null"
+#include "ofMain.h"
 #include "OFGameApp.hpp"
+#pragma GCC diagnostic pop
 
 
 //========================================================================

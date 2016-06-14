@@ -1,17 +1,33 @@
 #include "OFGameApp.hpp"
+#include "GameSettings.hpp"
+#include "TitleState.hpp"
+#include "GameState.hpp"
+#include "ExitState.hpp"
 
-OFGameApp::OFGameApp() :
-	app_status(Title)
-{
-
+OFGameApp::OFGameApp() {
 }
 
 void OFGameApp::setup() {
+	settings = std::make_shared<GameSettings>();
 
+	state[AppState::Title] = std::make_shared<TitleState>(settings);
+	state[AppState::Game] = std::make_shared<GameState>(settings);
+	state[AppState::Exit] = std::make_shared<ExitState>(settings);
+
+	ofAddListener(settings->resetStateEvent, this, &OFGameApp::resetState);
+	settings->setState(AppState::Title, true);
 }
+
 void OFGameApp::update() {
+	state[settings->getState()]->update();
 }
+
+void OFGameApp::resetState(const GameSettings::AppState& s) {
+	state[s]->setup();
+}
+
 void OFGameApp::draw() {
+	state[settings->getState()]->draw();
 }
 
 void OFGameApp::keyPressed(int key) {}

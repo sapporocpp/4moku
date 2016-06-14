@@ -1,21 +1,23 @@
 #pragma once
+#include "ofHeader.h"
+#include <memory>
+#include <map>
+#include "State.hpp"
 
-#include "ofMain.h"
 class OFGameApp : public ofBaseApp{
 public:
-	enum class AppStatus {
-		Title,
-		Game
-	};
 
 private:
-	AppStatus app_status;
+	using AppState = GameSettings::AppState;
+	std::shared_ptr<GameSettings> settings;
+	std::map<AppState, std::shared_ptr<State>> state;
 
 public:
 	OFGameApp();
 	void setup();
 	void update();
 	void draw();
+	void resetState(const GameSettings::AppState& state);
 
 	void keyPressed(int key);
 	void keyReleased(int key);

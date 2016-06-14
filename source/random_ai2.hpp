@@ -15,7 +15,7 @@ std::tuple<int,int> random_ai(const Board& board,int /*player*/) {
 	std::uniform_int_distribution<> rndx(0,nx);
 	std::uniform_int_distribution<> rndy(0,ny);
 
-	for(int i=0;i<300;++i) {
+	for(int i=0;i<600;++i) {
 		int x=rndx(mt), y=rndy(mt);
 		if(placeable(board, x, y)) 
 			return std::make_tuple(x,y);

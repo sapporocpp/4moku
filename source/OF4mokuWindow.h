@@ -1,6 +1,10 @@
 ﻿#pragma once
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-variable"
+#pragma GCC diagnostic ignored "-Wconversion-null"
 #include "ofMain.h"
+#pragma GCC diagnostic pop
 #include "4moku.hpp"
 #include <algorithm>
 #include <vector>

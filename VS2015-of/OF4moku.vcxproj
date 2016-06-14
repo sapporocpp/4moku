@@ -70,6 +70,7 @@
     <TargetName>$(ProjectName)_debug</TargetName>
     <LinkIncremental>true</LinkIncremental>
     <GenerateManifest>true</GenerateManifest>
+    <SourcePath>..\source;$(SourcePath)</SourcePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>bin\</OutDir>
@@ -188,12 +189,35 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\source\4moku.cpp" />
+    <ClCompile Include="..\source\AiList.cpp" />
+    <ClCompile Include="..\source\AiLogic.cpp" />
+    <ClCompile Include="..\source\ExitState.cpp" />
+    <ClCompile Include="..\source\GameSettings.cpp" />
+    <ClCompile Include="..\source\GameState.cpp" />
     <ClCompile Include="..\source\OF4mokuMain.cpp" />
-    <ClCompile Include="..\source\OF4mokuWindow.cpp" />
+    <ClCompile Include="..\source\OFGameApp.cpp" />
+    <ClCompile Include="..\source\TitleState.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\4moku.hpp" />
+    <ClInclude Include="..\source\AiList.hpp" />
+    <ClInclude Include="..\source\AiLogic.hpp" />
+    <ClInclude Include="..\source\ai_winning.hpp" />
+    <ClInclude Include="..\source\ExitState.hpp" />
+    <ClInclude Include="..\source\GameSettings.hpp" />
+    <ClInclude Include="..\source\GameState.hpp" />
+    <ClInclude Include="..\source\ignis-neighbors.hpp" />
+    <ClInclude Include="..\source\kakutei-more.hpp" />
+    <ClInclude Include="..\source\kakutei.hpp" />
+    <ClInclude Include="..\source\Layout.hpp" />
+    <ClInclude Include="..\source\manual_input.hpp" />
     <ClInclude Include="..\source\OF4mokuWindow.h" />
+    <ClInclude Include="..\source\OFGameApp.hpp" />
+    <ClInclude Include="..\source\ofHeader.h" />
+    <ClInclude Include="..\source\random_ai2.hpp" />
+    <ClInclude Include="..\source\State.hpp" />
+    <ClInclude Include="..\source\test_ai.hpp" />
+    <ClInclude Include="..\source\TitleState.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ProjectExtensions>

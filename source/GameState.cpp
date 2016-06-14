@@ -1,4 +1,5 @@
 #include "GameState.hpp"
+#include "Manual.hpp"
 
 GameState::GameState(std::shared_ptr<GameSettings> settings) :
 	settings(settings), board(0,0,0)
@@ -47,6 +48,7 @@ void GameState::draw() {
 
 	// draw board
 	ofSetColor(255, 224, 192);
+	ofFill();
 	ofDrawRectangle(margin.left, margin.top, grid_size*xnum, grid_size*ynum);
 	ofSetColor(0,0,0);
 	ofSetLineWidth(linewidth);
@@ -77,30 +79,40 @@ void GameState::draw() {
 
 void GameState::update() {
 	if(result.empty()) {
+		const int xnum = board.size_x();
+		const int ynum = board.size_y();
 		auto player = settings->get_player(current_player);
+		auto ret = -1;
 		if(player->name()=="Manual") {
+			auto mp = std::dynamic_pointer_cast<Manual>(player);
+			if(!mp->isActive()) {
+				mp->activate();
+				mp->setBoard(board);
+			}
+			mp->setLayout(margin, xnum, ynum);
+			if(mp->isSelected()) {
+				auto func = [&](const Board& b,int p){return player->next(b,p);};
+				ret = ::update(board, current_player,func);
+			}
 		}
 		else {
 			ofResetElapsedTimeCounter();
-			std::function<std::tuple<int,int>(const Board&,int)> func =
-						[&](const Board& b,int p){return player->next(b,p);};
+			auto func = [&](const Board& b,int p){return player->next(b,p);};
+			ret = ::update(board, current_player,func);
 			auto elapsed = ofGetElapsedTimeMillis();
 			if(elapsed<1000) {
 				ofSleepMillis(1000-elapsed);
 			}
+		}
 
-			auto ret = ::update(board, current_player,func);
-			if(ret!=0) {
-				if(ret==WIN) {
-					result = "Player " + std::to_string(current_player) +" WIN!";
-				}
-				else {
-					result = "Player " + std::to_string(current_player) +" Lose!";
-				}
-			}
-			else {
-				current_player = (current_player+1)%settings->get_num_players();
-			}
+		if(ret==WIN) {
+			result = "Player " + std::to_string(current_player) +" WIN!";
+		}
+		else if(ret==FAILED) {
+			result = "Player " + std::to_string(current_player) +" Lose!";
+		}
+		else if(ret==0) {
+			current_player = (current_player+1)%settings->get_num_players();
 		}
 	}
 }

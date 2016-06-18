@@ -12,9 +12,11 @@
 
 AiList::AiList() {
 	logics = {
+		std::make_shared<Manual>(),
 		std::make_shared<LogicWrapper>(AI_Neighbors, "Test AI"),
 		std::make_shared<LogicWrapper>(random_ai2,   "Random2"),
-		std::make_shared<Manual>(),
+		std::make_shared<KakuteiMoreOF<2>>(),
+		std::make_shared<KakuteiMoreOF<3>>(),
 	};
 }
 

@@ -222,3 +222,33 @@ public:
 		return th.position;
 	}
 };
+
+template <size_t SIMULATED_MOVES>
+struct KakuteiMoreOF : public AiLogic{
+private:
+	KakuteiMore<SIMULATED_MOVES> obj;
+	std::string ai_name;
+
+public:
+	KakuteiMoreOF() {
+		ai_name.assign("Sakiyomi");
+		ai_name.append(1, static_cast<char>('0' + SIMULATED_MOVES));
+	}
+
+	Position next(const Board& board, int player) {
+		return obj.ai(board, player);
+	}
+
+	std::string name() const {
+		return ai_name;
+	}
+
+	void draw() { };
+	void mouseMoved(ofMouseEventArgs& args) {};
+	void mouseDragged(ofMouseEventArgs& args) {};
+	void mousePressed(ofMouseEventArgs& args) {};
+	void mouseReleased(ofMouseEventArgs& args) {};
+	void mouseScrolled(ofMouseEventArgs& args) {};
+	void mouseEntered(ofMouseEventArgs& args) {};
+	void mouseExited(ofMouseEventArgs& args) {};
+};

@@ -1,4 +1,7 @@
 ﻿#include "4moku.hpp"
+#include <cstdlib>
+#include <boost/random.hpp>
+#include <boost/random/random_device.hpp>
 
 /*
  ランダムに数手置いてみて、一番勝てそうなものを採用する。
@@ -10,10 +13,10 @@ std::tuple<int,int> random_ai(const Board& board,int /*player*/) {
 	int nx,ny;
 	std::tie(nx,ny) = board.size();
 
-	std::random_device rd;
-	std::mt19937 mt(rd());
-	std::uniform_int_distribution<> rndx(0,nx);
-	std::uniform_int_distribution<> rndy(0,ny);
+	boost::random::random_device rd;
+	boost::random::mt19937 mt(rd());
+	boost::random::uniform_int_distribution<> rndx(0,nx);
+	boost::random::uniform_int_distribution<> rndy(0,ny);
 
 	for(int i=0;i<600;++i) {
 		int x=rndx(mt), y=rndy(mt);

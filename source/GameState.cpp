@@ -112,9 +112,11 @@ void GameState::update() {
 
 		if(ret==WIN) {
 			result = "Player " + std::to_string(current_player) +" WIN!";
+			ofRegisterMouseEvents(this);
 		}
 		else if(ret==FAILED) {
 			result = "Player " + std::to_string(current_player) +" Lose!";
+			ofRegisterMouseEvents(this);
 		}
 		else if(ret==0) {
 			current_player = (current_player+1)%settings->get_num_players();
@@ -126,7 +128,13 @@ void GameState::mouseMoved(ofMouseEventArgs& args) {
 	mousePos = ofVec2f(args.x, args.y);
 }
 
-void GameState::mouseReleased(ofMouseEventArgs& args){}
+void GameState::mouseReleased(ofMouseEventArgs& args){
+	if(!result.empty()) {
+		ofUnregisterMouseEvents(this);
+		settings->setState(GameSettings::AppState::Title, true);
+	}
+}
+
 void GameState::mouseDragged (ofMouseEventArgs& args){}
 void GameState::mousePressed (ofMouseEventArgs& args){}
 void GameState::mouseScrolled(ofMouseEventArgs& args){}

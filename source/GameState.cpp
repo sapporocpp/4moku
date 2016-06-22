@@ -73,8 +73,13 @@ void GameState::draw() {
 		}
 	}
 	
-	// draw for ai
-	settings->get_player(current_player)->draw();
+	if(result.empty()) {
+		// draw for ai
+		settings->get_player(current_player)->draw();
+	} else {
+		ofSetColor(220,220,220);
+		font.drawString(result, 10, 40);
+	}
 }
 
 void GameState::update() {
